@@ -1,4 +1,5 @@
 import Parser_Machine_Combinator_Primitives
+import Parser_Machine_Parse_Primitives
 import Parser_Primitives_Test_Support
 import Testing
 
@@ -327,12 +328,13 @@ private func unrecoverableRecursionParser(
 ) -> Parser.Machine.Parser<Input, Int, DepthError> {
     Parser.Machine.recursive(
         maxDepth: maxDepth,
-        onDepthExceeded: { DepthError.tooDeep(limit: $0) }
-    ) { builder, selfRef in
-        let open = Parser.Machine.leaf(OpenParen(), mapError: { _ in DepthError.openParen }, in: &builder)
-        let inner = selfRef.expression(in: &builder)
-        return Parser.Machine.sequence(open, inner, combine: { (_: Void, value: Int) in value }, in: &builder)
-    }
+        onDepthExceeded: { DepthError.tooDeep(limit: $0) },
+        { builder, selfRef in
+            let open = Parser.Machine.leaf(OpenParen(), mapError: { _ in DepthError.openParen }, in: &builder)
+            let inner = selfRef.expression(in: &builder)
+            return Parser.Machine.sequence(open, inner, combine: { (_: Void, value: Int) in value }, in: &builder)
+        }
+    )
 }
 
 extension Parser.Machine.Test.Recursive.`Edge Case` {

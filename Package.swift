@@ -168,6 +168,7 @@ let package = Package(
             name: "Parser Machine Combinator Primitives Tests",
             dependencies: [
                 "Parser Machine Combinator Primitives",
+                "Parser Machine Parse Primitives",
                 .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
             ]
         ),
