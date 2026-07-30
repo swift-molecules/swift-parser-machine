@@ -51,6 +51,12 @@ extension Parser.Machine.Parser.Parse {
     /// - Returns: The parsed output.
     /// - Throws: The failure error if parsing fails.
     public func callAsFunction(_ input: inout Input) throws(Failure) -> Output {
-        try Parser.Machine.run(program: parser.program, root: parser.root, input: &input, as: Output.self)
+        try Parser.Machine.run(
+            program: parser.program,
+            root: parser.root,
+            input: &input,
+            as: Output.self,
+            depthFailure: parser.depthFailure
+        )
     }
 }

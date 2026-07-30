@@ -312,3 +312,67 @@ extension Parser.Machine.Test.Recursive.Integration {
         #expect(input.isEmpty)
     }
 }
+
+// MARK: - Edge Case
+
+private enum DepthError: Swift.Error, Equatable, Sendable {
+    case tooDeep(limit: Int)
+    case openParen
+}
+
+/// A grammar that only ever recurses — no alternative, no repetition — so a
+/// depth-limit exhaustion has no recovery frame and must propagate.
+private func unrecoverableRecursionParser(
+    maxDepth: Int
+) -> Parser.Machine.Parser<Input, Int, DepthError> {
+    Parser.Machine.recursive(
+        maxDepth: maxDepth,
+        onDepthExceeded: { DepthError.tooDeep(limit: $0) }
+    ) { builder, selfRef in
+        let open = Parser.Machine.leaf(OpenParen(), mapError: { _ in DepthError.openParen }, in: &builder)
+        let inner = selfRef.expression(in: &builder)
+        return Parser.Machine.sequence(open, inner, combine: { (_: Void, value: Int) in value }, in: &builder)
+    }
+}
+
+extension Parser.Machine.Test.Recursive.`Edge Case` {
+    @Test
+    func `exceeding the depth limit with no recovery throws the configured typed failure`() throws {
+        let parser = unrecoverableRecursionParser(maxDepth: 4)
+
+        var bytes: [UInt8] = []
+        for _ in 0..<10 { bytes.append(UInt8(ascii: "(")) }
+        var input = makeInput(bytes)
+
+        #expect(throws: DepthError.tooDeep(limit: 4)) {
+            _ = try parser.parse(&input)
+        }
+    }
+
+    @Test
+    func `exceeding the depth limit with no recovery throws through the incremental path`() throws {
+        let parser = unrecoverableRecursionParser(maxDepth: 4)
+        var ctx = parser.parse.incremental
+
+        var bytes: [UInt8] = []
+        for _ in 0..<10 { bytes.append(UInt8(ascii: "(")) }
+        var input = makeInput(bytes)
+
+        #expect(throws: DepthError.tooDeep(limit: 4)) {
+            _ = try ctx(&input)
+        }
+    }
+
+    @Test
+    func `input shorter than the depth limit still fails with the grammar's own error`() throws {
+        let parser = unrecoverableRecursionParser(maxDepth: 100)
+
+        var bytes: [UInt8] = []
+        for _ in 0..<3 { bytes.append(UInt8(ascii: "(")) }
+        var input = makeInput(bytes)
+
+        #expect(throws: DepthError.openParen) {
+            _ = try parser.parse(&input)
+        }
+    }
+}

@@ -14,9 +14,19 @@ extension Parser.Machine {
 
         package let root: Node<Input, Failure>.ID
 
-        package init(program: Program<Input, Failure>, root: Node<Input, Failure>.ID) {
+        /// Maps an unrecovered depth-limit exhaustion into the grammar's own
+        /// `Failure`, so exceeding `maxDepth` propagates as a typed error
+        /// through the public parse path instead of terminating the process.
+        package let depthFailure: ((Int) -> Failure)?
+
+        package init(
+            program: Program<Input, Failure>,
+            root: Node<Input, Failure>.ID,
+            depthFailure: ((Int) -> Failure)? = nil
+        ) {
             self.program = program
             self.root = root
+            self.depthFailure = depthFailure
         }
 
         /// Executes the machine program against the input on an explicit frame stack.
@@ -25,7 +35,13 @@ extension Parser.Machine {
         /// - Returns: The parsed value.
         /// - Throws: `Failure` if parsing fails.
         public func parse(_ input: inout Input) throws(Failure) -> Output {
-            try Parser_Primitives.Parser.Machine.run(program: program, root: root, input: &input, as: Output.self)
+            try Parser_Primitives.Parser.Machine.run(
+                program: program,
+                root: root,
+                input: &input,
+                as: Output.self,
+                depthFailure: depthFailure
+            )
         }
     }
 }

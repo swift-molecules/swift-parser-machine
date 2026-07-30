@@ -79,7 +79,8 @@ extension Parser.Machine.Parser.Parse.Incremental {
             root: parser.root,
             input: &input,
             memoization: &memoization,
-            as: Output.self
+            as: Output.self,
+            depthFailure: parser.depthFailure
         )
     }
 }

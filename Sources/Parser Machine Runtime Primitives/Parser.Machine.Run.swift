@@ -10,7 +10,8 @@ extension Parser.Machine {
         program: Program<Input, Failure>,
         root: Node<Input, Failure>.ID,
         input: inout Input,
-        as outputType: Output.Type
+        as outputType: Output.Type,
+        depthFailure: ((Int) -> Failure)? = nil
     ) throws(Failure) -> Output
     where
         Input: Input_Primitives.Input.`Protocol` & ~Copyable,
@@ -320,7 +321,17 @@ extension Parser.Machine {
                         pendingHandle = handle
 
                     case .propagate:
-                        fatalError("Depth exceeded with no handler")
+                        // No recovery frame anywhere in the grammar: surface
+                        // the exhaustion as the grammar's own typed failure.
+                        if let depthFailure {
+                            throw depthFailure(limit)
+                        }
+                        // The grammar's `Failure` may itself be the machine's
+                        // runtime error type; propagate directly then.
+                        if let failure = error as? Failure {
+                            throw failure
+                        }
+                        fatalError("Depth exceeded with no handler: configure onDepthExceeded when building a depth-limited parser")
                     }
                 } else {
                     depth += 1

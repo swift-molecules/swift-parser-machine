@@ -18,6 +18,7 @@ extension Parser.Machine {
     /// ```
     public static func recursive<Input, Output, Failure>(
         maxDepth: Int? = nil,
+        onDepthExceeded: ((Int) -> Failure)? = nil,
         _ build: (inout Builder<Input, Failure>, Reference<Input, Failure, Output>) -> Expression<Input, Failure, Output>
     ) -> Parser<Input, Output, Failure>
     where
@@ -36,7 +37,7 @@ extension Parser.Machine {
         // Patch the hole to point to the actual root
         builder.inner[holeID] = .ref(root.node)
 
-        return Parser(program: builder.build(), root: root.node)
+        return Parser(program: builder.build(), root: root.node, depthFailure: onDepthExceeded)
     }
 
     /// Creates a non-recursive parser from a builder closure.
