@@ -26,7 +26,12 @@ extension Parser.Machine.Memoization {
         /// actually `Failure`-typed (a `Parser.Machine.Runtime.Error` such as
         /// the `.ref` depth-exceeded case is deliberately never boxed here —
         /// see that arm's comment).
-        case failure(any Swift.Error)
+        ///
+        /// The payload is `any Swift.Error` rather than a generic `Failure` parameter because a
+        /// single memoization table is shared across cache entries populated by invocations of
+        /// `Parser.Machine.run` with different concrete `Failure` types; type-erasure is the only
+        /// way to store and later re-throw each entry's original typed failure.
+        case failure(any Swift.Error)  // swiftlint:disable:this no_any_protocol_existential
     }
 }
 
