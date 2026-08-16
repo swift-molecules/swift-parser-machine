@@ -15,8 +15,8 @@ extension ByteParser {
         guard let byte = input.first else {
             throw .endOfInput
         }
-        // swift-format-ignore: NeverUseForceTry
-        try! input.advance()
+        // The guard above proves an element is available, so this advance cannot fail.
+        _ = try? input.advance()
         return byte
     }
 }
@@ -37,8 +37,8 @@ extension MatchByte {
         guard byte == expected else {
             throw .mismatch(expected: expected, actual: byte)
         }
-        // swift-format-ignore: NeverUseForceTry
-        try! input.advance()
+        // The guard above proves an element is available, so this advance cannot fail.
+        _ = try? input.advance()
         return byte
     }
 }

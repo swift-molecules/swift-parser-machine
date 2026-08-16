@@ -16,9 +16,10 @@ extension Parser.Machine {
 extension Parser.Machine.Test.Unit {
     @Test
     func `pure always succeeds with given value`() throws {
-        let parser: Parser.Machine.Parser<Input, Int, ByteParser.Error> = Parser.Machine.build { builder in
-            Parser.Machine.pure(42, in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, Int, ByteParser.Error> =
+            Parser.Machine.build { builder in
+                Parser.Machine.pure(42, in: &builder)
+            }
 
         var input = Input([1, 2, 3])
         let result = try parser.parse(&input)
@@ -28,9 +29,10 @@ extension Parser.Machine.Test.Unit {
 
     @Test
     func `leaf wraps parser as machine node`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, ByteParser.Error> = Parser.Machine.build { builder in
-            Parser.Machine.leaf(ByteParser(), in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, UInt8, ByteParser.Error> =
+            Parser.Machine.build { builder in
+                Parser.Machine.leaf(ByteParser(), in: &builder)
+            }
 
         var input = Input([65, 66, 67])
         let result = try parser.parse(&input)
@@ -40,10 +42,11 @@ extension Parser.Machine.Test.Unit {
 
     @Test
     func `map transforms output`() throws {
-        let parser: Parser.Machine.Parser<Input, Int, ByteParser.Error> = Parser.Machine.build { builder in
-            let byte = Parser.Machine.leaf(ByteParser(), in: &builder)
-            return byte.map({ Int($0) * 2 }, in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, Int, ByteParser.Error> =
+            Parser.Machine.build { builder in
+                let byte = Parser.Machine.leaf(ByteParser(), in: &builder)
+                return byte.map({ Int($0) * 2 }, in: &builder)
+            }
 
         var input = Input([10])
         let result = try parser.parse(&input)
@@ -52,11 +55,12 @@ extension Parser.Machine.Test.Unit {
 
     @Test
     func `sequence combines two parsers`() throws {
-        let parser: Parser.Machine.Parser<Input, (UInt8, UInt8), ByteParser.Error> = Parser.Machine.build { builder in
-            let first = Parser.Machine.leaf(ByteParser(), in: &builder)
-            let second = Parser.Machine.leaf(ByteParser(), in: &builder)
-            return Parser.Machine.sequence(first, second, combine: { ($0, $1) }, in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, (UInt8, UInt8), ByteParser.Error> =
+            Parser.Machine.build { builder in
+                let first = Parser.Machine.leaf(ByteParser(), in: &builder)
+                let second = Parser.Machine.leaf(ByteParser(), in: &builder)
+                return Parser.Machine.sequence(first, second, combine: { ($0, $1) }, in: &builder)
+            }
 
         var input = Input([1, 2, 3])
         let result = try parser.parse(&input)
@@ -67,13 +71,14 @@ extension Parser.Machine.Test.Unit {
 
     @Test
     func `oneOf selects first matching alternative`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> = Parser.Machine.build { builder in
-            let a = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
-                .map({ $0 }, in: &builder)
-            let b = Parser.Machine.leaf(MatchByte(expected: 66), in: &builder)
-                .map({ $0 }, in: &builder)
-            return Parser.Machine.oneOf([a, b], in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
+            Parser.Machine.build { builder in
+                let a = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+                    .map({ $0 }, in: &builder)
+                let b = Parser.Machine.leaf(MatchByte(expected: 66), in: &builder)
+                    .map({ $0 }, in: &builder)
+                return Parser.Machine.oneOf([a, b], in: &builder)
+            }
 
         var input = Input([65])
         let result = try parser.parse(&input)
@@ -82,13 +87,14 @@ extension Parser.Machine.Test.Unit {
 
     @Test
     func `oneOf falls through to second alternative`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> = Parser.Machine.build { builder in
-            let a = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
-                .map({ $0 }, in: &builder)
-            let b = Parser.Machine.leaf(MatchByte(expected: 66), in: &builder)
-                .map({ $0 }, in: &builder)
-            return Parser.Machine.oneOf([a, b], in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
+            Parser.Machine.build { builder in
+                let a = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+                    .map({ $0 }, in: &builder)
+                let b = Parser.Machine.leaf(MatchByte(expected: 66), in: &builder)
+                    .map({ $0 }, in: &builder)
+                return Parser.Machine.oneOf([a, b], in: &builder)
+            }
 
         var input = Input([66])
         let result = try parser.parse(&input)
@@ -97,11 +103,12 @@ extension Parser.Machine.Test.Unit {
 
     @Test
     func `many collects zero or more occurrences`() throws {
-        let parser: Parser.Machine.Parser<Input, [UInt8], MatchByte.Error> = Parser.Machine.build { builder in
-            let byte = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
-                .map({ $0 }, in: &builder)
-            return Parser.Machine.many(byte, in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, [UInt8], MatchByte.Error> =
+            Parser.Machine.build { builder in
+                let byte = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+                    .map({ $0 }, in: &builder)
+                return Parser.Machine.many(byte, in: &builder)
+            }
 
         var input = Input([65, 65, 65, 66])
         let result = try parser.parse(&input)
@@ -111,11 +118,12 @@ extension Parser.Machine.Test.Unit {
 
     @Test
     func `optional returns value on success`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8?, MatchByte.Error> = Parser.Machine.build { builder in
-            let byte = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
-                .map({ $0 }, in: &builder)
-            return Parser.Machine.optional(byte, in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, UInt8?, MatchByte.Error> =
+            Parser.Machine.build { builder in
+                let byte = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+                    .map({ $0 }, in: &builder)
+                return Parser.Machine.optional(byte, in: &builder)
+            }
 
         var input = Input([65, 66])
         let result = try parser.parse(&input)
@@ -129,11 +137,12 @@ extension Parser.Machine.Test.Unit {
 extension Parser.Machine.Test.`Edge Case` {
     @Test
     func `many returns empty array when no matches`() throws {
-        let parser: Parser.Machine.Parser<Input, [UInt8], MatchByte.Error> = Parser.Machine.build { builder in
-            let byte = Parser.Machine.leaf(MatchByte(expected: 0xFF), in: &builder)
-                .map({ $0 }, in: &builder)
-            return Parser.Machine.many(byte, in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, [UInt8], MatchByte.Error> =
+            Parser.Machine.build { builder in
+                let byte = Parser.Machine.leaf(MatchByte(expected: 0xFF), in: &builder)
+                    .map({ $0 }, in: &builder)
+                return Parser.Machine.many(byte, in: &builder)
+            }
 
         var input = Input([1, 2, 3])
         let result = try parser.parse(&input)
@@ -143,11 +152,12 @@ extension Parser.Machine.Test.`Edge Case` {
 
     @Test
     func `optional returns nil and restores input on failure`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8?, MatchByte.Error> = Parser.Machine.build { builder in
-            let byte = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
-                .map({ $0 }, in: &builder)
-            return Parser.Machine.optional(byte, in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, UInt8?, MatchByte.Error> =
+            Parser.Machine.build { builder in
+                let byte = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+                    .map({ $0 }, in: &builder)
+                return Parser.Machine.optional(byte, in: &builder)
+            }
 
         var input = Input([66, 67])
         let result = try parser.parse(&input)
@@ -157,13 +167,14 @@ extension Parser.Machine.Test.`Edge Case` {
 
     @Test
     func `oneOf throws when all alternatives fail`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> = Parser.Machine.build { builder in
-            let a = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
-                .map({ $0 }, in: &builder)
-            let b = Parser.Machine.leaf(MatchByte(expected: 66), in: &builder)
-                .map({ $0 }, in: &builder)
-            return Parser.Machine.oneOf([a, b], in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
+            Parser.Machine.build { builder in
+                let a = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+                    .map({ $0 }, in: &builder)
+                let b = Parser.Machine.leaf(MatchByte(expected: 66), in: &builder)
+                    .map({ $0 }, in: &builder)
+                return Parser.Machine.oneOf([a, b], in: &builder)
+            }
 
         var input = Input([67])
         #expect(throws: MatchByte.Error.self) {
@@ -175,10 +186,11 @@ extension Parser.Machine.Test.`Edge Case` {
 
     @Test
     func `many terminates when child succeeds without consuming input via pure`() throws {
-        let parser: Parser.Machine.Parser<Input, [Int], ByteParser.Error> = Parser.Machine.build { builder in
-            let p = Parser.Machine.pure(1, in: &builder)
-            return Parser.Machine.many(p, in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, [Int], ByteParser.Error> =
+            Parser.Machine.build { builder in
+                let p = Parser.Machine.pure(1, in: &builder)
+                return Parser.Machine.many(p, in: &builder)
+            }
 
         var input = Input([65, 66, 67])
         let result = try parser.parse(&input)
@@ -188,12 +200,13 @@ extension Parser.Machine.Test.`Edge Case` {
 
     @Test
     func `many terminates when child succeeds without consuming input via optional`() throws {
-        let parser: Parser.Machine.Parser<Input, [UInt8?], MatchByte.Error> = Parser.Machine.build { builder in
-            let neverMatches = Parser.Machine.leaf(MatchByte(expected: 0xFF), in: &builder)
-                .map({ $0 }, in: &builder)
-            let opt = Parser.Machine.optional(neverMatches, in: &builder)
-            return Parser.Machine.many(opt, in: &builder)
-        }
+        let parser: Parser.Machine.Parser<Input, [UInt8?], MatchByte.Error> =
+            Parser.Machine.build { builder in
+                let neverMatches = Parser.Machine.leaf(MatchByte(expected: 0xFF), in: &builder)
+                    .map({ $0 }, in: &builder)
+                let opt = Parser.Machine.optional(neverMatches, in: &builder)
+                return Parser.Machine.many(opt, in: &builder)
+            }
 
         var input = Input([1, 2, 3])
         let result = try parser.parse(&input)

@@ -28,10 +28,16 @@ extension Parser.Machine {
         // - 1 recursiveExit frame per level
         // - Up to 3 additional frames for combinator chains (sequence, map, oneOf, etc.)
         let depthEstimate = (program.maxDepth ?? 10000) * 4
-        // Provably-safe conversion: depthEstimate is a non-negative Int
-        // ((maxDepth ?? 10000) * 4), so Count construction cannot fail.
-        // swift-format-ignore: NeverUseForceTry
-        var frames = Stack<Frame>(minimumCapacity: try! Index<Frame>.Count(depthEstimate))
+        let frameCapacity: Index<Frame>.Count
+        do {
+            frameCapacity = try Index<Frame>.Count(depthEstimate)
+        } catch {
+            // Provably-safe conversion: depthEstimate is a non-negative Int
+            // ((maxDepth ?? 10000) * 4), so Count construction cannot fail.
+            // Sentinel for the never-reached path.
+            frameCapacity = .zero
+        }
+        var frames = Stack<Frame>(minimumCapacity: frameCapacity)
         var arena = Value.Arena(capacity: depthEstimate * 2)
 
         var depth = 0
@@ -39,10 +45,17 @@ extension Parser.Machine {
 
         // DEBUG INVARIANTS
         func checkInvariants(_ label: String) {
-            precondition(depth >= 0, "[\(label)] depth went negative: \(depth)")
-            precondition(current < program.graph.count, "[\(label)] current node out of bounds: \(current)")
+            let context = "[\(label)]"
+            precondition(depth >= 0, "\(context) depth went negative: \(depth)")
+            precondition(
+                current < program.graph.count,
+                "\(context) current node out of bounds: \(current)"
+            )
             if let limit = program.maxDepth {
-                precondition(depth <= limit + 1, "[\(label)] depth exceeded limit: \(depth) > \(limit)")
+                precondition(
+                    depth <= limit + 1,
+                    "\(context) depth exceeded limit: \(depth) > \(limit)"
+                )
             }
         }
 
@@ -190,7 +203,14 @@ extension Parser.Machine {
                         let finalValue = finalize.finalize(using: program.captures, results)
                         pendingHandle = arena.allocate(finalValue)
                     } else {
-                        frames.push(.many(child: child, savedCheckpoint: checkpoint, resultHandles: resultHandles, finalize: finalize))
+                        frames.push(
+                            .many(
+                                child: child,
+                                savedCheckpoint: checkpoint,
+                                resultHandles: resultHandles,
+                                finalize: finalize
+                            )
+                        )
                         current = child
                     }
 
@@ -202,7 +222,14 @@ extension Parser.Machine {
                         // Same progress guard as `.many`, above.
                         pendingHandle = arena.allocate(newAcc)
                     } else {
-                        frames.push(.fold(child: child, savedCheckpoint: checkpoint, accumulatorHandle: arena.allocate(newAcc), combine: combine))
+                        frames.push(
+                            .fold(
+                                child: child,
+                                savedCheckpoint: checkpoint,
+                                accumulatorHandle: arena.allocate(newAcc),
+                                combine: combine
+                            )
+                        )
                         current = child
                     }
 
@@ -289,24 +316,46 @@ extension Parser.Machine {
 
             case .many(let child, let finalize):
                 let checkpoint = input.checkpoint
-                frames.push(.many(child: child, savedCheckpoint: checkpoint, resultHandles: [], finalize: finalize))
+                frames.push(
+                    .many(
+                        child: child,
+                        savedCheckpoint: checkpoint,
+                        resultHandles: [],
+                        finalize: finalize
+                    )
+                )
                 current = child
 
             case .fold(let child, let initial, let combine):
                 let checkpoint = input.checkpoint
-                frames.push(.fold(child: child, savedCheckpoint: checkpoint, accumulatorHandle: arena.allocate(initial), combine: combine))
+                frames.push(
+                    .fold(
+                        child: child,
+                        savedCheckpoint: checkpoint,
+                        accumulatorHandle: arena.allocate(initial),
+                        combine: combine
+                    )
+                )
                 current = child
 
             case .optional(let child, let wrapSome, let noneValue):
                 let checkpoint = input.checkpoint
                 // Pre-allocate the none value in the arena
                 let noneHandle = arena.allocate(noneValue)
-                frames.push(.optional(savedCheckpoint: checkpoint, wrapSome: wrapSome, noneHandle: noneHandle))
+                frames.push(
+                    .optional(
+                        savedCheckpoint: checkpoint,
+                        wrapSome: wrapSome,
+                        noneHandle: noneHandle
+                    )
+                )
                 current = child
 
             case .ref(let target):
                 if let limit = program.maxDepth, depth >= limit {
-                    let error = Parser_Primitives.Parser.Machine.Runtime.Error.depthExceeded(limit: limit)
+                    let error = Parser_Primitives.Parser.Machine.Runtime.Error.depthExceeded(
+                        limit: limit
+                    )
                     switch try handleFailure(
                         error: error,
                         frames: &frames,
@@ -331,7 +380,7 @@ extension Parser.Machine {
                         if let failure = error as? Failure {
                             throw failure
                         }
-                        fatalError("Depth exceeded with no handler: configure onDepthExceeded when building a depth-limited parser")
+                        fatalError("Depth exceeded without an onDepthExceeded handler configured.")
                     }
                 } else {
                     depth += 1

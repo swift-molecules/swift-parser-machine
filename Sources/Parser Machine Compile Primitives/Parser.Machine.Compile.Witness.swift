@@ -35,14 +35,22 @@ extension Parser.Machine.Compile {
         P.Failure: Swift.Error
     {
         @usableFromInline
-        let _compile: (consuming P, inout Parser.Machine.Builder<P.Input, P.Failure>) -> Parser.Machine.Expression<P.Input, P.Failure, P.Output>
+        let _compile:
+            (
+                consuming P,
+                inout Parser.Machine.Builder<P.Input, P.Failure>
+            ) -> Parser.Machine.Expression<P.Input, P.Failure, P.Output>
 
         /// Creates a compilation witness.
         ///
         /// - Parameter compile: A closure that compiles a parser into a Machine expression.
         @inlinable
         public init(
-            compile: @escaping (consuming P, inout Parser.Machine.Builder<P.Input, P.Failure>) -> Parser.Machine.Expression<P.Input, P.Failure, P.Output>
+            compile:
+                @escaping (
+                    consuming P,
+                    inout Parser.Machine.Builder<P.Input, P.Failure>
+                ) -> Parser.Machine.Expression<P.Input, P.Failure, P.Output>
         ) {
             self._compile = compile
         }
