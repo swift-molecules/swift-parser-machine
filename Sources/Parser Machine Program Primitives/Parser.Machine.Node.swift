@@ -5,7 +5,10 @@ internal import Tagged_Primitives
 
 extension Parser.Machine {
     /// Node is a typealias to the core Machine.Node with Parsing's Leaf type.
-    public typealias Node<Input: Input_Primitives.Input.`Protocol` & ~Copyable, Failure: Swift.Error> =
+    public typealias Node<
+        Input: Input_Primitives.Input.`Protocol` & ~Copyable,
+        Failure: Swift.Error
+    > =
         Machine_Primitives.Machine.Node<Leaf<Input, Failure>, Failure, Mode>
 
     /// Parsing-specific leaf: a closure-based parser operation.

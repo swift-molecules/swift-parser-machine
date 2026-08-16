@@ -183,6 +183,11 @@ extension Parser.Machine.Compiled: Parser_Primitives.Parser.`Protocol` where P: 
     /// - Throws: `Failure` if parsing fails.
     public borrowing func parse(_ input: inout Input) throws(Failure) -> Output {
         let result = cache.getOrCompile()
-        return try Parser.Machine.run(program: result.program, root: result.root, input: &input, as: Output.self)
+        return try Parser.Machine.run(
+            program: result.program,
+            root: result.root,
+            input: &input,
+            as: Output.self
+        )
     }
 }

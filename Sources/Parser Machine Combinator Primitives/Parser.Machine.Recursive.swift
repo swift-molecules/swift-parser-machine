@@ -19,7 +19,10 @@ extension Parser.Machine {
     public static func recursive<Input, Output, Failure>(
         maxDepth: Int? = nil,
         onDepthExceeded: ((Int) -> Failure)? = nil,
-        _ build: (inout Builder<Input, Failure>, Reference<Input, Failure, Output>) -> Expression<Input, Failure, Output>
+        _ build: (
+            inout Builder<Input, Failure>,
+            Reference<Input, Failure, Output>
+        ) -> Expression<Input, Failure, Output>
     ) -> Parser<Input, Output, Failure>
     where
         Input: Input_Primitives.Input.`Protocol` & ~Copyable,

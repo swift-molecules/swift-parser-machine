@@ -4,12 +4,17 @@ public import Parser_Machine_Program_Primitives
 import Parser_Primitives
 
 extension Parser.Machine {
-    /// A parser built from a defunctionalized program that runs without recursive call-stack growth.
+    /// A parser built from a defunctionalized program that runs without recursive
+    /// call-stack growth.
     ///
     /// `Parser` is NOT `Sendable` per [MEM-SEND-013] Pattern B terminal direction.
     /// Consumers transport across isolation domains via `sending` at the
     /// program-transport boundary.
-    public struct Parser<Input: Input_Primitives.Input.`Protocol` & ~Copyable, Output, Failure: Swift.Error>: Parser_Primitives.Parser.`Protocol` {
+    public struct Parser<
+        Input: Input_Primitives.Input.`Protocol` & ~Copyable,
+        Output,
+        Failure: Swift.Error
+    >: Parser_Primitives.Parser.`Protocol` {
         package let program: Program<Input, Failure>
 
         package let root: Node<Input, Failure>.ID

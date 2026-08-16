@@ -14,8 +14,8 @@ extension ByteParser {
         guard let byte = input.first else {
             throw .endOfInput
         }
-        // swift-format-ignore: NeverUseForceTry
-        try! input.advance()
+        // The guard above proves an element is available, so this advance cannot fail.
+        _ = try? input.advance()
         return byte
     }
 }
@@ -36,8 +36,8 @@ extension MatchByte {
         guard byte == expected else {
             throw .mismatch(expected: expected, actual: byte)
         }
-        // swift-format-ignore: NeverUseForceTry
-        try! input.advance()
+        // The guard above proves an element is available, so this advance cannot fail.
+        _ = try? input.advance()
         return byte
     }
 }
@@ -55,8 +55,9 @@ extension Input {
         var copy = self
         var result: [UInt8] = []
         while !copy.isEmpty {
-            // swift-format-ignore: NeverUseForceTry
-            result.append(try! copy.advance())
+            // The loop condition proves an element is available, so this advance cannot fail.
+            guard let element = try? copy.advance() else { break }
+            result.append(element)
         }
         return result
     }

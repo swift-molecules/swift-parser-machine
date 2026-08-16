@@ -26,11 +26,16 @@ extension Parser.Machine.Memoization {
 // MARK: - Lookup
 
 extension Parser.Machine.Memoization.Table {
-    package func lookup(_ key: Parser.Machine.Memoization.Key<Checkpoint>) -> Parser.Machine.Memoization.Entry<Checkpoint>? {
+    package func lookup(
+        _ key: Parser.Machine.Memoization.Key<Checkpoint>
+    ) -> Parser.Machine.Memoization.Entry<Checkpoint>? {
         storage[key]
     }
 
-    package mutating func store(_ entry: Parser.Machine.Memoization.Entry<Checkpoint>, for key: Parser.Machine.Memoization.Key<Checkpoint>) {
+    package mutating func store(
+        _ entry: Parser.Machine.Memoization.Entry<Checkpoint>,
+        for key: Parser.Machine.Memoization.Key<Checkpoint>
+    ) {
         storage[key] = entry
     }
 }

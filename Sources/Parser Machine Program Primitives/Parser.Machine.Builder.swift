@@ -7,7 +7,10 @@ extension Parser.Machine {
     ///
     /// Note: Builder does not conform to Sendable. Program construction should
     /// complete on a single task before the resulting Parser is used.
-    public struct Builder<Input: Input_Primitives.Input.`Protocol` & ~Copyable, Failure: Swift.Error>: ~Copyable {
+    public struct Builder<
+        Input: Input_Primitives.Input.`Protocol` & ~Copyable,
+        Failure: Swift.Error
+    >: ~Copyable {
         package var inner: Machine_Primitives.Machine.Builder<Leaf<Input, Failure>, Failure, Mode>
 
         package init(maxDepth: Int? = nil) {
