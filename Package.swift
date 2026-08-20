@@ -1,15 +1,15 @@
-// swift-tools-version: 6.3.3
+// swift-tools-version: 6.4
 
 import PackageDescription
 
 let package = Package(
     name: "swift-parser-machine-primitives",
     platforms: [
-        .macOS("27"),
-        .iOS("27"),
-        .tvOS("27"),
-        .watchOS("27"),
-        .visionOS("27")
+        .macOS(.v27),
+        .iOS(.v27),
+        .tvOS(.v27),
+        .watchOS(.v27),
+        .visionOS(.v27),
     ],
     products: [
         .library(
@@ -46,11 +46,26 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-primitives/swift-parser-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-stack-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-tagged-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-machine-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-input-primitives.git", branch: "main"),
+        .package(
+            url: "https://github.com/swift-primitives/swift-parser-primitives.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-stack-primitives.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-tagged-primitives.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-machine-primitives.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-input-primitives.git",
+            branch: "main"
+        ),
     ],
     targets: [
         // MARK: - Program (IR)
@@ -143,7 +158,7 @@ let package = Package(
         .testTarget(
             name: "Parser Machine Program Primitives Tests",
             dependencies: [
-                "Parser Machine Program Primitives",
+                "Parser Machine Program Primitives"
             ]
         ),
 
@@ -151,7 +166,10 @@ let package = Package(
             name: "Parser Machine Memoization Primitives Tests",
             dependencies: [
                 "Parser Machine Memoization Primitives",
-                .product(name: "Tagged Primitives Test Support", package: "swift-tagged-primitives"),
+                .product(
+                    name: "Tagged Primitives Test Support",
+                    package: "swift-tagged-primitives"
+                ),
             ]
         ),
 
@@ -160,7 +178,10 @@ let package = Package(
             dependencies: [
                 "Parser Machine Compile Primitives",
                 "Parser Machine Combinator Primitives",
-                .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
+                .product(
+                    name: "Parser Primitives Test Support",
+                    package: "swift-parser-primitives"
+                ),
             ]
         ),
 
@@ -169,7 +190,10 @@ let package = Package(
             dependencies: [
                 "Parser Machine Combinator Primitives",
                 "Parser Machine Parse Primitives",
-                .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
+                .product(
+                    name: "Parser Primitives Test Support",
+                    package: "swift-parser-primitives"
+                ),
             ]
         ),
 
@@ -183,7 +207,10 @@ let package = Package(
                 // interpreter actually cached — see that test's comment for why a
                 // black-box double-parse cannot observe the write-side fix.
                 "Parser Machine Memoization Primitives",
-                .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
+                .product(
+                    name: "Parser Primitives Test Support",
+                    package: "swift-parser-primitives"
+                ),
             ]
         ),
 
@@ -192,7 +219,10 @@ let package = Package(
             dependencies: [
                 "Parser Machine Compile Primitives",
                 "Parser Machine Combinator Primitives",
-                .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
+                .product(
+                    name: "Parser Primitives Test Support",
+                    package: "swift-parser-primitives"
+                ),
             ]
         ),
 
@@ -201,8 +231,14 @@ let package = Package(
             name: "Parser Machine Primitives Test Support",
             dependencies: [
                 "Parser Machine Primitives",
-                .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
-                .product(name: "Tagged Primitives Test Support", package: "swift-tagged-primitives"),
+                .product(
+                    name: "Parser Primitives Test Support",
+                    package: "swift-parser-primitives"
+                ),
+                .product(
+                    name: "Tagged Primitives Test Support",
+                    package: "swift-tagged-primitives"
+                ),
             ],
             path: "Tests/Support"
         ),
