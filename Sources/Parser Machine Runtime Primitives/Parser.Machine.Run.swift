@@ -3,7 +3,7 @@ package import Machine_Primitives
 package import Parser_Machine_Program_Primitives
 import Parser_Primitives
 internal import Stack_Primitives
-package import Tagged_Primitives
+import Tagged_Primitives
 
 extension Parser.Machine {
     package static func run<Input, Output, Failure>(
