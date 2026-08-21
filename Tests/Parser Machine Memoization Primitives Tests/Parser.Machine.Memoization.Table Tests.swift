@@ -15,8 +15,6 @@ struct `Parser.Machine.Memoization.Table Tests` {
     @Suite(.serialized) struct Performance {}
 }
 
-// MARK: - Unit
-
 extension `Parser.Machine.Memoization.Table Tests`.Unit {
     @Test
     func `new table is empty`() {
@@ -67,8 +65,6 @@ extension `Parser.Machine.Memoization.Table Tests`.Unit {
     }
 }
 
-// MARK: - Edge Cases
-
 extension `Parser.Machine.Memoization.Table Tests`.`Edge Case` {
     @Test
     func `lookup for missing key returns nil`() {
@@ -117,7 +113,6 @@ extension `Parser.Machine.Memoization.Table Tests`.`Edge Case` {
         let key5 = Parser.Machine.Memoization.Key<Int>(position: 5, node: 1)
         let key15 = Parser.Machine.Memoization.Key<Int>(position: 15, node: 1)
 
-        // Failure entries: kept only if position < edit.start
         table.store(.failure(TestFailure.sample), for: key0)
         table.store(.failure(TestFailure.sample), for: key5)
         table.store(.failure(TestFailure.sample), for: key15)
@@ -126,9 +121,6 @@ extension `Parser.Machine.Memoization.Table Tests`.`Edge Case` {
         let edit = Parser.Machine.Memoization.Edit<Int>(start: 5, oldEnd: 10, newEnd: 8)
         table.invalidate(edit)
 
-        // key0 (position 0): kept (0 < 5)
-        // key5 (position 5): removed (5 >= 5)
-        // key15 (position 15): removed for failure (15 >= 5); would be kept for success if end <= 5
         #expect(table.lookup(key0) != nil)
         #expect(table.lookup(key5) == nil)
     }

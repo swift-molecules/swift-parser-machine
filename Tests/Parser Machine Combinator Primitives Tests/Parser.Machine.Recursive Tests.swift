@@ -3,8 +3,6 @@ import Parser_Machine_Parse_Primitives
 import Parser_Primitives_Test_Support
 import Testing
 
-// MARK: - Shared Grammar Helpers
-
 private struct OpenParen: Parser.`Protocol`, Sendable {}
 
 extension OpenParen {
@@ -12,7 +10,7 @@ extension OpenParen {
 
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: "(") else { throw .expected }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
     }
 }
@@ -24,7 +22,7 @@ extension CloseParen {
 
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: ")") else { throw .expected }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
     }
 }
@@ -68,8 +66,6 @@ private func balancedParenParser(
     }
 }
 
-// MARK: - XML-like Grammar Helpers
-
 private struct XMLElement: Sendable, Equatable {
     var name: String
     var content: [XMLContent]
@@ -85,7 +81,7 @@ extension OpenBracket {
     enum Error: Swift.Error, Sendable { case expected }
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: "<") else { throw .expected }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
     }
 }
@@ -96,7 +92,7 @@ extension CloseBracket {
     enum Error: Swift.Error, Sendable { case expected }
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: ">") else { throw .expected }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
     }
 }
@@ -107,15 +103,13 @@ extension SlashClose {
     enum Error: Swift.Error, Sendable { case expected }
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: "/") else { throw .expected }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
         guard input.first == UInt8(ascii: ">") else { throw .expected }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
     }
 }
-
-// MARK: - TryMap Grammar Helpers
 
 private struct StartTagOutput: Sendable {
     var isEmpty: Bool
@@ -127,15 +121,15 @@ extension ParseOpen {
     enum Error: Swift.Error, Sendable { case expected }
     func parse(_ input: inout Input) throws(Error) -> StartTagOutput {
         guard input.first == UInt8(ascii: "<") else { throw .expected }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
         guard input.first == UInt8(ascii: "/") else {
             return StartTagOutput(isEmpty: false)
         }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
         guard input.first == UInt8(ascii: ">") else { throw .expected }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
         return StartTagOutput(isEmpty: true)
     }
@@ -147,12 +141,10 @@ extension ParseClose {
     enum Error: Swift.Error, Sendable { case expected }
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: ">") else { throw .expected }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
     }
 }
-
-// MARK: - Suite
 
 extension Parser.Machine.Test {
     @Suite struct Recursive {
@@ -162,8 +154,6 @@ extension Parser.Machine.Test {
         @Suite(.serialized) struct Performance {}
     }
 }
-
-// MARK: - Unit
 
 extension Parser.Machine.Test.Recursive.Unit {
     @Test
@@ -202,8 +192,6 @@ extension Parser.Machine.Test.Recursive.Unit {
         #expect(result == 42)
     }
 }
-
-// MARK: - Integration
 
 extension Parser.Machine.Test.Recursive.Integration {
     @Test
@@ -365,15 +353,11 @@ extension Parser.Machine.Test.Recursive.Integration {
     }
 }
 
-// MARK: - Edge Case
-
 private enum DepthError: Swift.Error, Equatable, Sendable {
     case tooDeep(limit: Int)
     case openParen
 }
 
-/// A grammar that only ever recurses — no alternative, no repetition — so a
-/// depth-limit exhaustion has no recovery frame and must propagate.
 private func unrecoverableRecursionParser(
     maxDepth: Int
 ) -> Parser.Machine.Parser<Input, Int, DepthError> {

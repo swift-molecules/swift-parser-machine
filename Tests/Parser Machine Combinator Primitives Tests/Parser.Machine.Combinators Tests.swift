@@ -11,8 +11,6 @@ extension Parser.Machine {
     }
 }
 
-// MARK: - Unit
-
 extension Parser.Machine.Test.Unit {
     @Test
     func `pure always succeeds with given value`() throws {
@@ -132,8 +130,6 @@ extension Parser.Machine.Test.Unit {
     }
 }
 
-// MARK: - Edge Cases
-
 extension Parser.Machine.Test.`Edge Case` {
     @Test
     func `many returns empty array when no matches`() throws {
@@ -181,8 +177,6 @@ extension Parser.Machine.Test.`Edge Case` {
             _ = try parser.parse(&input)
         }
     }
-
-    // MARK: F-004 regression
 
     @Test
     func `many terminates when child succeeds without consuming input via pure`() throws {

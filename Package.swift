@@ -68,7 +68,6 @@ let package = Package(
         ),
     ],
     targets: [
-        // MARK: - Program (IR)
 
         .target(
             name: "Parser Machine Program Primitives",
@@ -79,8 +78,6 @@ let package = Package(
                 .product(name: "Input Primitives", package: "swift-input-primitives"),
             ]
         ),
-
-        // MARK: - Runtime (execution)
 
         .target(
             name: "Parser Machine Runtime Primitives",
@@ -94,8 +91,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Memoization
-
         .target(
             name: "Parser Machine Memoization Primitives",
             dependencies: [
@@ -104,8 +99,6 @@ let package = Package(
                 .product(name: "Input Primitives", package: "swift-input-primitives"),
             ]
         ),
-
-        // MARK: - Compile
 
         .target(
             name: "Parser Machine Compile Primitives",
@@ -116,8 +109,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Combinator
-
         .target(
             name: "Parser Machine Combinator Primitives",
             dependencies: [
@@ -126,8 +117,6 @@ let package = Package(
                 .product(name: "Input Primitives", package: "swift-input-primitives"),
             ]
         ),
-
-        // MARK: - Parse
 
         .target(
             name: "Parser Machine Parse Primitives",
@@ -138,8 +127,6 @@ let package = Package(
                 .product(name: "Input Primitives", package: "swift-input-primitives"),
             ]
         ),
-
-        // MARK: - Umbrella
 
         .target(
             name: "Parser Machine Primitives",
@@ -152,8 +139,6 @@ let package = Package(
                 "Parser Machine Parse Primitives",
             ]
         ),
-
-        // MARK: - Tests
 
         .testTarget(
             name: "Parser Machine Program Primitives Tests",
@@ -202,10 +187,7 @@ let package = Package(
             dependencies: [
                 "Parser Machine Parse Primitives",
                 "Parser Machine Combinator Primitives",
-                // F-001 revision-1 regression needs direct `package`-level access
-                // to `Parser.Machine.Memoization.{Table,Key}` to inspect what the
-                // interpreter actually cached — see that test's comment for why a
-                // black-box double-parse cannot observe the write-side fix.
+
                 "Parser Machine Memoization Primitives",
                 .product(
                     name: "Parser Primitives Test Support",
@@ -226,7 +208,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Test Support
         .target(
             name: "Parser Machine Primitives Test Support",
             dependencies: [

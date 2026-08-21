@@ -1,43 +1,8 @@
-//
-//  Machine.Prepared.swift
-//  swift-parser-primitives
-//
-//  Immutable compiled parser wrapper for cross-task sharing.
-//
-
 public import Input_Primitives
 public import Machine_Primitives
 
 extension Parser.Machine {
-    /// An immutable, pre-compiled parser wrapper.
-    ///
-    /// `Prepared` holds a fully compiled Machine program with no lazy state.
-    /// It is conditionally `Sendable` and safe for cross-task sharing.
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// // From lazy Compiled
-    /// let prepared = myParser.compiled(using: .leaf).prepared()
-    ///
-    /// // Direct preparation
-    /// let prepared = myParser.prepared(using: .leaf)
-    ///
-    /// // Safe to share across tasks
-    /// await withTaskGroup(of: Output.self) { group in
-    ///     for input in inputs {
-    ///         group.addTask {
-    ///             var input = input
-    ///             return try prepared.parse(&input)
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// ## Thread Safety
-    ///
-    /// `Prepared` is conditionally `Sendable` when `P` is `Sendable`.
-    /// It contains no mutable state and is safe for concurrent use.
+
     public struct Prepared<P: Parser_Primitives.Parser.`Protocol` & ~Copyable>
     where
         P.Input: Input_Primitives.Input.`Protocol`,
@@ -49,11 +14,6 @@ extension Parser.Machine {
         @usableFromInline
         let root: Node<P.Input, P.Failure>.ID
 
-        /// Creates a prepared parser from a compiled program.
-        ///
-        /// - Parameters:
-        ///   - program: The compiled Machine program.
-        ///   - root: The root node ID for execution.
         @inlinable
         package init(
             program: Program<P.Input, P.Failure>,
@@ -63,13 +23,6 @@ extension Parser.Machine {
             self.root = root
         }
 
-        /// Creates a prepared parser by compiling the source parser.
-        ///
-        /// The parser is consumed and moved into the compiled Machine program.
-        ///
-        /// - Parameters:
-        ///   - source: The parser to compile. Consumed.
-        ///   - witness: The compilation witness.
         public init(source: consuming P, witness: Compile.Witness<P>) {
             var builder = Builder<P.Input, P.Failure>()
             let expression = witness.compile(source, into: &builder)
@@ -79,30 +32,15 @@ extension Parser.Machine {
     }
 }
 
-// MARK: - Parser Conformance
-
 extension Parser.Machine.Prepared: Parser_Primitives.Parser.`Protocol` where P: ~Copyable {
-    /// The input type consumed by the wrapped parser.
+
     public typealias Input = P.Input
 
-    /// The output type produced by the wrapped parser.
     public typealias Output = P.Output
 
-    /// The error type thrown by the wrapped parser.
     public typealias Failure = P.Failure
 
-    /// Executes the pre-compiled machine program against the input.
-    ///
-    /// - Parameter input: The input to parse from. Modified to reflect consumption.
-    /// - Returns: The parsed value.
-    /// - Throws: `Failure` if parsing fails.
     public func parse(_ input: inout Input) throws(Failure) -> Output {
         try Parser.Machine.run(program: program, root: root, input: &input, as: Output.self)
     }
 }
-
-// MARK: - Sendable Conformance
-//
-// Note: Prepared does NOT conform to Sendable because the underlying Machine.Program
-// contains closures that may not be Sendable. For cross-task sharing, wrap in an
-// explicit Sendable container with documented invariants, or use actors.

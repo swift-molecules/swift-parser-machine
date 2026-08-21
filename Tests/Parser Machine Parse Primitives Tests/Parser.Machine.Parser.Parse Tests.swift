@@ -11,8 +11,6 @@ struct `Parser.Machine.Parser.Parse Tests` {
     @Suite(.serialized) struct Performance {}
 }
 
-// MARK: - Unit
-
 extension `Parser.Machine.Parser.Parse Tests`.Unit {
     @Test
     func `parse accessor callAsFunction executes parser`() throws {

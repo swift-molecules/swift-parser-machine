@@ -9,8 +9,6 @@ struct `Parser.Machine.Memoization.Edit Tests` {
     @Suite(.serialized) struct Performance {}
 }
 
-// MARK: - Unit
-
 extension `Parser.Machine.Memoization.Edit Tests`.Unit {
     @Test
     func `init stores start, oldEnd, and newEnd`() {
@@ -36,8 +34,6 @@ extension `Parser.Machine.Memoization.Edit Tests`.Unit {
         #expect(delete.newEnd == 10)
     }
 }
-
-// MARK: - Edge Cases
 
 extension `Parser.Machine.Memoization.Edit Tests`.`Edge Case` {
     @Test

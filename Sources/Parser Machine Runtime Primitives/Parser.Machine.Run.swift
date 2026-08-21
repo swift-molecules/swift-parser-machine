@@ -23,18 +23,13 @@ extension Parser.Machine {
         typealias Recovery = Parser_Primitives.Parser.Machine.Failure.Recovery
 
         var current = root
-        // Pre-allocate stack capacity based on maxDepth or reasonable default.
-        // The 4x multiplier accounts for worst-case frame usage per recursion level:
-        // - 1 recursiveExit frame per level
-        // - Up to 3 additional frames for combinator chains (sequence, map, oneOf, etc.)
+
         let depthEstimate = (program.maxDepth ?? 10000) * 4
         let frameCapacity: Index<Frame>.Count
         do {
             frameCapacity = try Index<Frame>.Count(depthEstimate)
         } catch {
-            // Provably-safe conversion: depthEstimate is a non-negative Int
-            // ((maxDepth ?? 10000) * 4), so Count construction cannot fail.
-            // Sentinel for the never-reached path.
+
             frameCapacity = .zero
         }
         var frames = Stack<Frame>(minimumCapacity: frameCapacity)
@@ -43,7 +38,6 @@ extension Parser.Machine {
         var depth = 0
         var pendingHandle: Value.Handle? = nil
 
-        // DEBUG INVARIANTS
         func checkInvariants(_ label: String) {
             let context = "[\(label)]"
             precondition(depth >= 0, "\(context) depth went negative: \(depth)")
@@ -154,13 +148,7 @@ extension Parser.Machine {
                             checkInvariants("after-tryMap-handleFailure-handleReady")
 
                         case .propagate:
-                            // `error` is dynamically (and, under SE-0413, statically)
-                            // the machine's unified `Failure`: the caught value comes
-                            // from `transform.apply(…) throws(Failure)`. Binding it to a
-                            // `Failure`-typed local re-throws it WITHOUT weakening the
-                            // enclosing `throws(Failure)` contract. A bare `throw error`
-                            // trips a spurious `any Error` catch-inference in this
-                            // multi-case switch; the explicit binding pins the type.
+
                             let failure: Failure = error
                             throw failure
                         }
@@ -188,13 +176,7 @@ extension Parser.Machine {
                     resultHandles.append(handle)
                     let checkpoint = input.checkpoint
                     if checkpoint == priorCheckpoint {
-                        // PEG progress guard: the child succeeded without
-                        // consuming input. Looping back into it would repeat
-                        // the identical zero-width success forever, growing
-                        // `resultHandles`/the arena without bound. Standard
-                        // packrat semantics: stop the repetition as soon as
-                        // the child stops making progress, keeping the
-                        // result it already produced.
+
                         var results: [Value] = []
                         results.reserveCapacity(resultHandles.count)
                         for resultHandle in resultHandles {
@@ -219,7 +201,7 @@ extension Parser.Machine {
                     let newAcc = combine.combine(using: program.captures, acc, value)
                     let checkpoint = input.checkpoint
                     if checkpoint == priorCheckpoint {
-                        // Same progress guard as `.many`, above.
+
                         pendingHandle = arena.allocate(newAcc)
                     } else {
                         frames.push(
@@ -234,7 +216,7 @@ extension Parser.Machine {
                     }
 
                 case .optional(_, let wrapSome, let noneHandle):
-                    // Release the pre-allocated none value since we have a result
+
                     _ = arena.release(noneHandle)
                     let wrapped = wrapSome.apply(using: program.captures, value)
                     pendingHandle = arena.allocate(wrapped)
@@ -340,7 +322,7 @@ extension Parser.Machine {
 
             case .optional(let child, let wrapSome, let noneValue):
                 let checkpoint = input.checkpoint
-                // Pre-allocate the none value in the arena
+
                 let noneHandle = arena.allocate(noneValue)
                 frames.push(
                     .optional(
@@ -370,13 +352,11 @@ extension Parser.Machine {
                         pendingHandle = handle
 
                     case .propagate:
-                        // No recovery frame anywhere in the grammar: surface
-                        // the exhaustion as the grammar's own typed failure.
+
                         if let depthFailure {
                             throw depthFailure(limit)
                         }
-                        // The grammar's `Failure` may itself be the machine's
-                        // runtime error type; propagate directly then.
+
                         if let failure = error as? Failure {
                             throw failure
                         }

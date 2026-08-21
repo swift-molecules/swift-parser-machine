@@ -11,8 +11,6 @@ struct `Parser.Machine.Prepared Tests` {
     @Suite(.serialized) struct Performance {}
 }
 
-// MARK: - Unit
-
 extension `Parser.Machine.Prepared Tests`.Unit {
     @Test
     func `prepared parser eagerly compiles from source`() throws {
@@ -37,8 +35,6 @@ extension `Parser.Machine.Prepared Tests`.Unit {
         #expect(result2 == 20)
     }
 }
-
-// MARK: - Edge Cases
 
 extension `Parser.Machine.Prepared Tests`.`Edge Case` {
     @Test

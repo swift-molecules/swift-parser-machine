@@ -1,10 +1,3 @@
-//
-//  Machine.Run.Memoization.swift
-//  swift-parser-primitives
-//
-//  Memoized program execution.
-//
-
 package import Input_Primitives
 package import Machine_Primitives
 import Parser_Primitives
@@ -12,10 +5,7 @@ internal import Stack_Primitives
 import Tagged_Primitives
 
 extension Parser.Machine {
-    /// Executes the program with memoization.
-    ///
-    /// Caches parse results at each (position, node) pair,
-    /// enabling linear-time parsing and incremental re-parsing.
+
     package static func run<Input, Output, Failure>(
         program: Program<Input, Failure>,
         root: Node<Input, Failure>.ID,
@@ -37,18 +27,13 @@ extension Parser.Machine {
         typealias MemoEntry = Parser_Primitives.Parser.Machine.Memoization.Entry<Input.Checkpoint>
 
         var current = root
-        // Pre-allocate stack capacity based on maxDepth or reasonable default.
-        // The 4x multiplier accounts for worst-case frame usage per recursion level:
-        // - 1 recursiveExit frame per level
-        // - Up to 3 additional frames for combinator chains (sequence, map, oneOf, etc.)
+
         let depthEstimate = (program.maxDepth ?? 10000) * 4
         let frameCapacity: Index<Frame>.Count
         do {
             frameCapacity = try Index<Frame>.Count(depthEstimate)
         } catch {
-            // Provably-safe conversion: depthEstimate is a non-negative Int
-            // ((maxDepth ?? 10000) * 4), so Count construction cannot fail.
-            // Sentinel for the never-reached path.
+
             frameCapacity = .zero
         }
         var frames = Stack<Frame>(minimumCapacity: frameCapacity)
@@ -103,34 +88,7 @@ extension Parser.Machine {
                     depth -= 1
 
                 case .extra(.memoization(let node, let startPosition)):
-                    // Only a value that is actually this run's `Failure` may be
-                    // memoized here: `error` is `E: Swift.Error` generically, and
-                    // the `.ref` depth-exceeded call site (below) passes a
-                    // `Parser.Machine.Runtime.Error` — a *different* type from the
-                    // grammar's own `Failure` — when the machine hits
-                    // `program.maxDepth`. Storing that verbatim used to let a
-                    // `Runtime.Error` masquerade as this table's `Failure`-typed
-                    // `.failure` payload, so a later cache hit reaching the
-                    // `.propagate` arm below would downcast it to `Failure` and
-                    // crash (`storedError as? Failure` failing is exactly the
-                    // "cached failure type mismatch" `fatalError`).
-                    //
-                    // Skipping the store for a non-`Failure` error is also the
-                    // *sound* choice, not just the crash-avoiding one: depth is a
-                    // function of the call path that reached this (position, node)
-                    // pair, not of position alone, so a depth-exceeded outcome is
-                    // not a stable fact to cache at this key in the first place —
-                    // a different call path could reach the same (position, node)
-                    // pair at a different depth and get a different answer. Not
-                    // caching it means the depth check is simply re-evaluated
-                    // (against the *current* depth) the next time this node is
-                    // reached, which is the only sound behavior.
-                    //
-                    // This makes every `.failure` entry in the table provably
-                    // `Failure`-typed by construction — this is the only writer of
-                    // `.failure` (see `Entry.failure`'s doc comment) — so the
-                    // `storedError as? Failure` downcast at the cache-hit
-                    // `.propagate` arm, below, can no longer fail.
+
                     if let failure = error as? Failure {
                         let key = MemoKey(position: startPosition, node: node)
                         memoization.store(.failure(failure), for: key)
@@ -181,11 +139,7 @@ extension Parser.Machine {
                             pendingHandle = recoveredHandle
 
                         case .propagate:
-                            // `error` is the machine's unified `Failure` (thrown by
-                            // `transform.apply(…) throws(Failure)`); bind it to a
-                            // `Failure`-typed local to re-throw without weakening the
-                            // enclosing `throws(Failure)` contract. A bare `throw error`
-                            // trips a spurious `any Error` catch-inference here.
+
                             let failure: Failure = error
                             throw failure
                         }
@@ -213,13 +167,7 @@ extension Parser.Machine {
                     resultHandles.append(handle)
                     let checkpoint = input.checkpoint
                     if checkpoint == priorCheckpoint {
-                        // PEG progress guard: the child succeeded without
-                        // consuming input. Looping back into it would repeat
-                        // the identical zero-width success forever, growing
-                        // `resultHandles`/the arena without bound. Standard
-                        // packrat semantics: stop the repetition as soon as
-                        // the child stops making progress, keeping the
-                        // result it already produced.
+
                         var results: [Value] = []
                         results.reserveCapacity(resultHandles.count)
                         for resultHandle in resultHandles {
@@ -244,7 +192,7 @@ extension Parser.Machine {
                     let newAcc = combine.combine(using: program.captures, acc, value)
                     let checkpoint = input.checkpoint
                     if checkpoint == priorCheckpoint {
-                        // Same progress guard as `.many`, above.
+
                         pendingHandle = arena.allocate(newAcc)
                     } else {
                         frames.push(
@@ -268,7 +216,7 @@ extension Parser.Machine {
                     pendingHandle = arena.allocate(value)
 
                 case .extra(.memoization(let node, let startPosition)):
-                    // Cache the successful result
+
                     let key = MemoKey(position: startPosition, node: node)
                     let entry = MemoEntry.success(output: value, end: input.checkpoint)
                     memoization.store(entry, for: key)
@@ -278,18 +226,17 @@ extension Parser.Machine {
                 continue
             }
 
-            // Check memoization before executing node
             let memoKey = MemoKey(position: input.checkpoint, node: current.underlying)
             if let cached = memoization.lookup(memoKey) {
                 switch cached {
                 case .success(let output, let endPosition):
-                    // Cache hit: use cached result
+
                     input.seek(to: endPosition)
                     pendingHandle = arena.allocate(output)
                     continue
 
                 case .failure(let storedError):
-                    // Cached failure: propagate through failure handling
+
                     switch try handleMemoizedFailure(
                         error: storedError,
                         frames: &frames,
@@ -307,26 +254,7 @@ extension Parser.Machine {
                         continue
 
                     case .propagate:
-                        // A repeat parse of previously-failed input hits this
-                        // cached entry and must re-throw the *same* typed
-                        // failure that originally propagated to the root
-                        // without a recovery frame — not crash the process.
-                        //
-                        // `storedError as? Failure` is provably non-failing here,
-                        // not merely "unreachable in practice": `.extra(.memoization)`
-                        // (above) is the *only* writer of `.failure`, and it now
-                        // only stores when `error as? Failure` itself already
-                        // succeeded — so every `.failure` entry in this table is,
-                        // by construction, a boxed `Failure`. (An earlier version
-                        // of this guard rested that claim on a different premise —
-                        // "this `Table`'s sole owner never mixes `Failure` types" —
-                        // which was false: the `.ref` depth-exceeded path below
-                        // used to pass a `Parser.Machine.Runtime.Error`, a
-                        // *different* type from this run's `Failure`, into this
-                        // same storage arm, and it got boxed verbatim. That is
-                        // what the `guard`/`fatalError` below defends against; it
-                        // is kept as a documented invariant check, not a reachable
-                        // error path.)
+
                         guard let typedFailure = storedError as? Failure else {
                             preconditionFailure(
                                 """
@@ -341,7 +269,6 @@ extension Parser.Machine {
                 }
             }
 
-            // Cache miss: push memoization frame and execute
             frames.push(
                 .extra(.memoization(node: current.underlying, startPosition: input.checkpoint))
             )
@@ -464,13 +391,11 @@ extension Parser.Machine {
                         pendingHandle = handle
 
                     case .propagate:
-                        // No recovery frame anywhere in the grammar: surface
-                        // the exhaustion as the grammar's own typed failure.
+
                         if let depthFailure {
                             throw depthFailure(limit)
                         }
-                        // The grammar's `Failure` may itself be the machine's
-                        // runtime error type; propagate directly then.
+
                         if let failure = error as? Failure {
                             throw failure
                         }

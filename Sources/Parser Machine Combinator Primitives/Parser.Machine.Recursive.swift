@@ -4,18 +4,7 @@ import Parser_Primitives
 internal import Tagged_Primitives
 
 extension Parser.Machine {
-    /// Creates a parser for a recursive grammar.
-    ///
-    /// The build closure receives a `Reference` that can be used to create recursive references.
-    /// The closure must return an `Expression` that will be the root of the grammar.
-    ///
-    /// Example:
-    /// ```swift
-    /// let parser = Parser.Machine.recursive { builder, selfRef in
-    ///     // Build grammar using `selfRef` for recursive references
-    ///     ...
-    /// }
-    /// ```
+
     public static func recursive<Input, Output, Failure>(
         maxDepth: Int? = nil,
         onDepthExceeded: ((Int) -> Failure)? = nil,
@@ -30,20 +19,16 @@ extension Parser.Machine {
     {
         var builder = Builder<Input, Failure>(maxDepth: maxDepth)
 
-        // Allocate a hole for the recursive reference
         let holeID = builder.allocate(.hole)
         let ref = Reference<Input, Failure, Output>(node: holeID)
 
-        // Build the grammar
         let root = build(&builder, ref)
 
-        // Patch the hole to point to the actual root
         builder.inner[holeID] = .ref(root.node)
 
         return Parser(program: builder.build(), root: root.node, depthFailure: onDepthExceeded)
     }
 
-    /// Creates a non-recursive parser from a builder closure.
     public static func build<Input, Output, Failure>(
         _ build: (inout Builder<Input, Failure>) -> Expression<Input, Failure, Output>
     ) -> Parser<Input, Output, Failure>

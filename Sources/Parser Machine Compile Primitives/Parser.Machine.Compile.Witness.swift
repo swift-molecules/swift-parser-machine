@@ -1,34 +1,12 @@
-//
-//  Machine.Compile.Witness.swift
-//  swift-parser-primitives
-//
-//  Witness struct for parser compilation.
-//
-
 public import Input_Primitives
 
 extension Parser.Machine {
-    /// Namespace for compilation-related types.
+
     public enum Compile {}
 }
 
 extension Parser.Machine.Compile {
-    /// A witness that knows how to compile a parser into a Machine expression.
-    ///
-    /// This is a value-based alternative to protocol conformance. Each parser
-    /// type can have its own witness instance that provides compilation logic.
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// // Create a witness for a specific parser
-    /// let witness = Compile.Witness<MyParser> { parser, builder in
-    ///     Machine.leaf(parser, in: &builder)
-    /// }
-    ///
-    /// // Use it to compile
-    /// let compiled = myParser.compiled(using: witness)
-    /// ```
+
     public struct Witness<P: Parser_Primitives.Parser.`Protocol` & ~Copyable>
     where
         P.Input: Input_Primitives.Input.`Protocol`,
@@ -41,9 +19,6 @@ extension Parser.Machine.Compile {
                 inout Parser.Machine.Builder<P.Input, P.Failure>
             ) -> Parser.Machine.Expression<P.Input, P.Failure, P.Output>
 
-        /// Creates a compilation witness.
-        ///
-        /// - Parameter compile: A closure that compiles a parser into a Machine expression.
         @inlinable
         public init(
             compile:
@@ -55,7 +30,6 @@ extension Parser.Machine.Compile {
             self._compile = compile
         }
 
-        /// Compiles the given parser using this witness.
         @inlinable
         public func compile(
             _ parser: consuming P,
@@ -66,13 +40,8 @@ extension Parser.Machine.Compile {
     }
 }
 
-// MARK: - Leaf Witness
-
 extension Parser.Machine.Compile.Witness where P: ~Copyable {
-    /// Creates a witness that compiles the parser as a leaf node.
-    ///
-    /// This wraps the parser's `parse` method directly, treating it as
-    /// an opaque operation in the Machine program.
+
     @inlinable
     public static var leaf: Self {
         Self { parser, builder in

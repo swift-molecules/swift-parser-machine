@@ -3,8 +3,6 @@ import Parser_Machine_Compile_Primitives
 import Parser_Primitives_Test_Support
 import Testing
 
-// MARK: - Test Suite Structure
-
 @Suite("Parser.Machine.Equivalence")
 struct ParserMachineEquivalenceTests {
     @Suite("Direct ≡ Compiled") struct DirectEqualsCompiled {}
@@ -12,15 +10,12 @@ struct ParserMachineEquivalenceTests {
     @Suite struct Caching {}
 }
 
-// MARK: - Direct ≡ Compiled
-
 extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
     @Test
     func `leaf - single byte parse`() throws {
-        // Direct
+
         let direct = ByteParser()
 
-        // Compiled via Machine
         let machine: Parser.Machine.Parser<Input, UInt8, ByteParser.Error> =
             Parser.Machine.build { builder in
                 Parser.Machine.leaf(ByteParser(), in: &builder)
@@ -38,10 +33,9 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
 
     @Test
     func `map - byte to Int transformation`() throws {
-        // Direct
+
         let direct = ByteParser()
 
-        // Machine with map
         let machine: Parser.Machine.Parser<Input, Int, ByteParser.Error> =
             Parser.Machine.build { builder in
                 let byte = Parser.Machine.leaf(ByteParser(), in: &builder)
@@ -70,11 +64,9 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
         var input1 = makeInput([1, 2, 3])
         var input2 = makeInput([1, 2, 3])
 
-        // Direct: two sequential parses
         let a1 = try ByteParser().parse(&input1)
         let b1 = try ByteParser().parse(&input1)
 
-        // Machine: sequence combinator
         let result2 = try machine.parse(&input2)
 
         #expect(a1 == result2.0)
@@ -214,7 +206,7 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
     func `recursive - nested parentheses depth 5`() throws {
         let machine = balancedParenParser(maxDepth: 100)
 
-        var input = makeInput("((((()))))")  // depth 5
+        var input = makeInput("((((()))))")
         let result = try machine.parse(&input)
 
         #expect(result == 5)
@@ -237,8 +229,6 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
     }
 }
 
-// MARK: - Stack Safety
-
 extension ParserMachineEquivalenceTests.`Stack Safety` {
     @Test
     func `recursive parser at depth 1000 without stack overflow`() throws {
@@ -255,8 +245,6 @@ extension ParserMachineEquivalenceTests.`Stack Safety` {
         #expect(input.first == nil)
     }
 }
-
-// MARK: - Caching
 
 extension ParserMachineEquivalenceTests.Caching {
     @Test
@@ -287,8 +275,6 @@ extension ParserMachineEquivalenceTests.Caching {
     }
 }
 
-// MARK: - Shared Grammar Helpers
-
 private struct OpenParen: Parser.`Protocol`, Sendable {}
 
 extension OpenParen {
@@ -296,7 +282,7 @@ extension OpenParen {
 
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: "(") else { throw .expected }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
     }
 }
@@ -308,7 +294,7 @@ extension CloseParen {
 
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: ")") else { throw .expected }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
     }
 }

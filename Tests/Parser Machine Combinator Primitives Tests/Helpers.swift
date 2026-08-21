@@ -14,7 +14,7 @@ extension ByteParser {
         guard let byte = input.first else {
             throw .endOfInput
         }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
         return byte
     }
@@ -36,7 +36,7 @@ extension MatchByte {
         guard byte == expected else {
             throw .mismatch(expected: expected, actual: byte)
         }
-        // The guard above proves an element is available, so this advance cannot fail.
+
         _ = try? input.advance()
         return byte
     }
@@ -55,7 +55,7 @@ extension Input {
         var copy = self
         var result: [UInt8] = []
         while !copy.isEmpty {
-            // The loop condition proves an element is available, so this advance cannot fail.
+
             guard let element = try? copy.advance() else { break }
             result.append(element)
         }

@@ -11,8 +11,6 @@ struct `Parser.Machine.Compiled Tests` {
     @Suite(.serialized) struct Performance {}
 }
 
-// MARK: - Unit
-
 extension `Parser.Machine.Compiled Tests`.Unit {
     @Test
     func `compiled parser lazily compiles on first parse`() throws {

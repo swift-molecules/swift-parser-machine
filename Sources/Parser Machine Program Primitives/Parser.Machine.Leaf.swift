@@ -4,7 +4,7 @@ import Parser_Primitives
 public import Tagged_Primitives
 
 extension Parser.Machine {
-    /// Creates a leaf expression that wraps an existing parser.
+
     @inlinable
     public static func leaf<Input, Output, Failure, P>(
         _ parser: consuming P,
@@ -27,7 +27,6 @@ extension Parser.Machine {
         return Expression(node: nodeID)
     }
 
-    /// Creates a leaf expression that wraps an existing parser with error mapping.
     @inlinable
     public static func leaf<Input, Output, Failure, P>(
         _ parser: consuming P,

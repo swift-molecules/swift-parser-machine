@@ -4,12 +4,7 @@ public import Parser_Machine_Program_Primitives
 import Parser_Primitives
 
 extension Parser.Machine {
-    /// A parser built from a defunctionalized program that runs without recursive
-    /// call-stack growth.
-    ///
-    /// `Parser` is NOT `Sendable` per [MEM-SEND-013] Pattern B terminal direction.
-    /// Consumers transport across isolation domains via `sending` at the
-    /// program-transport boundary.
+
     public struct Parser<
         Input: Input_Primitives.Input.`Protocol` & ~Copyable,
         Output,
@@ -19,9 +14,6 @@ extension Parser.Machine {
 
         package let root: Node<Input, Failure>.ID
 
-        /// Maps an unrecovered depth-limit exhaustion into the grammar's own
-        /// `Failure`, so exceeding `maxDepth` propagates as a typed error
-        /// through the public parse path instead of terminating the process.
         package let depthFailure: ((Int) -> Failure)?
 
         package init(
@@ -34,11 +26,6 @@ extension Parser.Machine {
             self.depthFailure = depthFailure
         }
 
-        /// Executes the machine program against the input on an explicit frame stack.
-        ///
-        /// - Parameter input: The input to parse from. Modified to reflect consumption.
-        /// - Returns: The parsed value.
-        /// - Throws: `Failure` if parsing fails.
         public func parse(_ input: inout Input) throws(Failure) -> Output {
             try Parser_Primitives.Parser.Machine.run(
                 program: program,
