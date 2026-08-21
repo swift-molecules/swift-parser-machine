@@ -35,9 +35,11 @@ extension Parser.Machine {
     /// let prepared = myParser.compiled(using: .leaf).prepared()
     /// // `prepared` can be shared across tasks
     /// ```
-    public struct Compiled<P: Parser_Primitives.Parser.`Protocol` & ~Copyable>: ~Copyable
+    public struct Compiled<
+        P: Parser_Primitives.Parser.`Protocol`<P.Input, P.Output, P.Failure> & ~Copyable
+    >: Copyable
     where
-        P.Input: Input_Primitives.Input.`Protocol`,
+        P.Input: Input_Primitives.Input.`Protocol`<P.Input.Element>,
         P.Failure: Swift.Error
     {
         @usableFromInline
@@ -72,15 +74,6 @@ extension Parser.Machine {
         }
     }
 }
-
-// MARK: - Conditional Copyable Conformance
-
-// `Compiled` is `~Copyable` when `P` is `~Copyable` and `Copyable` when `P`
-// is `Copyable`. For `Copyable` P, this preserves the original reference-
-// sharing semantics: copies of `Compiled` share the same `Cache` instance
-// via class reference, amortizing compilation cost across copies. For
-// `~Copyable` P, no copies exist (the wrapper is uniquely owned).
-extension Parser.Machine.Compiled: Copyable where P: Copyable {}
 
 // MARK: - Result
 
