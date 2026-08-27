@@ -1,11 +1,11 @@
-# Parser Machine Primitives
+# Parser Machine
 
 ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
-[![CI](https://github.com/swift-primitives/swift-parser-machine-primitives/actions/workflows/ci.yml/badge.svg)](https://github.com/swift-primitives/swift-parser-machine-primitives/actions/workflows/ci.yml)
+[![CI](https://github.com/swift-molecules/swift-parser-machine/actions/workflows/ci.yml/badge.svg)](https://github.com/swift-molecules/swift-parser-machine/actions/workflows/ci.yml)
 
 A defunctionalized parser machine — grammars are built as flat program graphs and executed on an explicit, heap-allocated frame stack, so recursion depth is a runtime parameter instead of a call-stack limit. A recursive-descent parser overflows the thread stack on deeply nested input; a `Parser.Machine` program parses thousands of nesting levels with a bounded `maxDepth` you choose.
 
-`Parser.Machine` extends the `Parser` namespace from [`swift-parser-primitives`](https://github.com/swift-primitives/swift-parser-primitives): any existing `Parser.Protocol` parser embeds into a program as a leaf node, and the assembled program is itself a `Parser.Protocol` parser, so machine-compiled parsers compose with the rest of the parser ecosystem unchanged.
+`Parser.Machine` extends the `Parser` namespace from [`swift-parser`](https://github.com/swift-molecules/swift-parser): any existing `Parser.Protocol` parser embeds into a program as a leaf node, and the assembled program is itself a `Parser.Protocol` parser, so machine-compiled parsers compose with the rest of the parser ecosystem unchanged.
 
 ---
 
@@ -24,8 +24,8 @@ A defunctionalized parser machine — grammars are built as flat program graphs 
 A balanced-parentheses grammar. The recursive self-reference goes through `selfRef`, and `maxDepth` bounds nesting explicitly — depths that would overflow a recursive-descent parser's call stack:
 
 ```swift
-import Parser_Machine_Primitives
-import Parser_Primitives_Test_Support  // Parser.Test.Input — any input type works
+import Parser_Machine
+import Parser_Test_Support  // Parser.Test.Input — any input type works
 
 typealias Input = Parser.Test.Input
 
@@ -75,7 +75,7 @@ Add the dependency to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-primitives/swift-parser-machine-primitives.git", branch: "main")
+    .package(url: "https://github.com/swift-molecules/swift-parser-machine.git", branch: "main")
 ]
 ```
 
@@ -85,7 +85,7 @@ Add a product to your target:
 .target(
     name: "App",
     dependencies: [
-        .product(name: "Parser Machine Primitives", package: "swift-parser-machine-primitives")
+        .product(name: "Parser Machine", package: "swift-parser-machine")
     ]
 )
 ```
@@ -100,14 +100,14 @@ The umbrella re-exports six modules; import a subset when you need less surface.
 
 | Product | Contents | When to import |
 |---------|----------|----------------|
-| `Parser Machine Primitives` | Umbrella — re-exports all modules below | Most consumers |
-| `Parser Machine Program Primitives` | The program IR — `Builder`, `Expression`, `Reference`, `leaf` | Building or inspecting programs without executing them |
-| `Parser Machine Runtime Primitives` | `Parser.Machine.Parser` and explicit-stack execution | Running a program handed to you |
-| `Parser Machine Combinator Primitives` | `pure`, `map`, `tryMap`, `flatMap`, `sequence`, `oneOf`, `many`, `optional`, `recursive`, `build` | Writing grammars |
-| `Parser Machine Memoization Primitives` | Memoization table, keys, edit descriptors | Custom memoization control |
-| `Parser Machine Compile Primitives` | `Compiled`, `Prepared`, `Compile.Witness` | Compiling existing `Parser.Protocol` parsers |
-| `Parser Machine Parse Primitives` | `parse` accessor — direct, `incremental`, `.compiled()` / `.prepared()` | Execution-variant selection on assembled parsers |
-| `Parser Machine Primitives Test Support` | Shared test helpers | Test targets only |
+| `Parser Machine` | Umbrella — re-exports all modules below | Most consumers |
+| `Parser Machine Program` | The program IR — `Builder`, `Expression`, `Reference`, `leaf` | Building or inspecting programs without executing them |
+| `Parser Machine Runtime` | `Parser.Machine.Parser` and explicit-stack execution | Running a program handed to you |
+| `Parser Machine Combinator` | `pure`, `map`, `tryMap`, `flatMap`, `sequence`, `oneOf`, `many`, `optional`, `recursive`, `build` | Writing grammars |
+| `Parser Machine Memoization` | Memoization table, keys, edit descriptors | Custom memoization control |
+| `Parser Machine Compile` | `Compiled`, `Prepared`, `Compile.Witness` | Compiling existing `Parser.Protocol` parsers |
+| `Parser Machine Parse` | `parse` accessor — direct, `incremental`, `.compiled()` / `.prepared()` | Execution-variant selection on assembled parsers |
+| `Parser Machine Test Support` | Shared test helpers | Test targets only |
 
 Neither `Builder` nor the assembled `Parser` is `Sendable`; construct on one task and transport across isolation domains via `sending`. `prepared()` returns an immutable wrapper for cross-task sharing.
 
@@ -126,10 +126,10 @@ Neither `Builder` nor the assembled `Parser` is `Sendable`; construct on one tas
 
 ## Related Packages
 
-- [`swift-parser-primitives`](https://github.com/swift-primitives/swift-parser-primitives) — the `Parser` namespace, `Parser.Protocol`, and the leaf parsers this package compiles.
-- [`swift-machine-primitives`](https://github.com/swift-primitives/swift-machine-primitives) — the generic defunctionalized-machine substrate (builder, capture store, value arena) the parser machine specializes.
-- [`swift-input-primitives`](https://github.com/swift-primitives/swift-input-primitives) — the input-cursor protocol and concrete cursors the parsers consume.
-- [`swift-stack-primitives`](https://github.com/swift-primitives/swift-stack-primitives) — the frame stack the runtime executes on.
+- [`swift-parser`](https://github.com/swift-molecules/swift-parser) — the `Parser` namespace, `Parser.Protocol`, and the leaf parsers this package compiles.
+- [`swift-machine`](https://github.com/swift-molecules/swift-machine) — the generic defunctionalized-machine substrate (builder, capture store, value arena) the parser machine specializes.
+- [`swift-input`](https://github.com/swift-molecules/swift-input) — the input-cursor protocol and concrete cursors the parsers consume.
+- [`swift-stack`](https://github.com/swift-molecules/swift-stack) — the frame stack the runtime executes on.
 
 ---
 

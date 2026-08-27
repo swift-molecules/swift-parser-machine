@@ -1,0 +1,415 @@
+package import Input
+package import Machine
+import Parser
+internal import Stack
+import Tagged
+
+extension Parser.Machine {
+
+    package static func run<Input, Output, Failure>(
+        program: Program<Input, Failure>,
+        root: Node<Input, Failure>.ID,
+        input: inout Input,
+        memoization: inout Memoization.Table<Input.Checkpoint>,
+        as outputType: Output.Type,
+        depthFailure: ((Int) -> Failure)? = nil
+    ) throws(Failure) -> Output
+    where
+        Input: Input.Input.`Protocol` & ~Copyable,
+        Input.Checkpoint: Hashable,
+        Failure: Swift.Error
+    {
+        typealias Value = Parser.Parser.Machine.Value
+        typealias Frame = Parser.Parser.Machine.Frame<Input, Failure>
+        typealias Node = Parser.Parser.Machine.Node<Input, Failure>
+        typealias Recovery = Parser.Parser.Machine.Failure.Recovery
+        typealias MemoKey = Parser.Parser.Machine.Memoization.Key<Input.Checkpoint>
+        typealias MemoEntry = Parser.Parser.Machine.Memoization.Entry<Input.Checkpoint>
+
+        var current = root
+
+        let depthEstimate = (program.maxDepth ?? 10000) * 4
+        let frameCapacity: Index<Frame>.Count
+        do {
+            frameCapacity = try Index<Frame>.Count(depthEstimate)
+        } catch {
+
+            frameCapacity = .zero
+        }
+        var frames = Stack<Frame>(minimumCapacity: frameCapacity)
+        var arena = Value.Arena(capacity: depthEstimate * 2)
+
+        var depth = 0
+        var pendingHandle: Value.Handle? = nil
+
+        func handleMemoizedFailure<E: Swift.Error>(
+            error: E,
+            frames: inout Stack<Frame>,
+            arena: inout Value.Arena,
+            input: inout Input,
+            depth: inout Int,
+            memoization: inout Memoization.Table<Input.Checkpoint>
+        ) throws(Failure) -> Recovery {
+            while let frame = frames.pop() {
+                switch frame {
+                case .oneOf(let alternatives, let index, let savedCheckpoint):
+                    if index < alternatives.count {
+                        input.seek(to: savedCheckpoint)
+                        frames.push(
+                            .oneOf(
+                                alternatives: alternatives,
+                                index: index + 1,
+                                savedCheckpoint: savedCheckpoint
+                            )
+                        )
+                        return .continueWith(alternatives[index].retag(Recovery.Tag.self))
+                    }
+
+                case .many(_, let savedCheckpoint, let resultHandles, let finalize):
+                    input.seek(to: savedCheckpoint)
+                    var results: [Value] = []
+                    results.reserveCapacity(resultHandles.count)
+                    for handle in resultHandles {
+                        results.append(arena.release(handle))
+                    }
+                    let finalValue = finalize.finalize(using: program.captures, results)
+                    let handle = arena.allocate(finalValue)
+                    return .handleReady(handle)
+
+                case .optional(let savedCheckpoint, _, let noneHandle):
+                    input.seek(to: savedCheckpoint)
+                    return .handleReady(noneHandle)
+
+                case .fold(_, let savedCheckpoint, let accHandle, _):
+                    input.seek(to: savedCheckpoint)
+                    return .handleReady(accHandle)
+
+                case .recursiveExit:
+                    depth -= 1
+
+                case .extra(.memoization(let node, let startPosition)):
+
+                    if let failure = error as? Failure {
+                        let key = MemoKey(position: startPosition, node: node)
+                        memoization.store(.failure(failure), for: key)
+                    }
+
+                case .map, .tryMap, .flatMap, .sequence:
+                    continue
+                }
+            }
+            return .propagate
+        }
+
+        while true {
+            if let handle = pendingHandle {
+                pendingHandle = nil
+                let value = arena.release(handle)
+
+                if frames.isEmpty {
+                    return value[as: Output.self]
+                }
+
+                guard let frame = frames.pop() else {
+                    fatalError("Internal error: expected frame on stack")
+                }
+
+                switch frame {
+                case .map(let transform):
+                    let transformed = transform.apply(using: program.captures, value)
+                    pendingHandle = arena.allocate(transformed)
+
+                case .tryMap(let transform):
+                    do throws(Failure) {
+                        let transformed = try transform.apply(using: program.captures, value)
+                        pendingHandle = arena.allocate(transformed)
+                    } catch {
+                        switch try handleMemoizedFailure(
+                            error: error,
+                            frames: &frames,
+                            arena: &arena,
+                            input: &input,
+                            depth: &depth,
+                            memoization: &memoization
+                        ) {
+                        case .continueWith(let recovered):
+                            current = recovered.retag(Node.self)
+
+                        case .handleReady(let recoveredHandle):
+                            pendingHandle = recoveredHandle
+
+                        case .propagate:
+
+                            let failure: Failure = error
+                            throw failure
+                        }
+                    }
+
+                case .flatMap(let next):
+                    let erasedID = next.next(using: program.captures, value)
+                    current = erasedID.retag(Node.self)
+
+                case .sequence(.second(let b, let combine)):
+                    let firstHandle = arena.allocate(value)
+                    frames.push(.sequence(.combine(firstHandle: firstHandle, combine: combine)))
+                    current = b
+
+                case .sequence(.combine(let firstHandle, let combine)):
+                    let first = arena.release(firstHandle)
+                    let combined = combine.combine(using: program.captures, first, value)
+                    pendingHandle = arena.allocate(combined)
+
+                case .oneOf:
+                    pendingHandle = arena.allocate(value)
+
+                case .many(let child, let priorCheckpoint, var resultHandles, let finalize):
+                    let handle = arena.allocate(value)
+                    resultHandles.append(handle)
+                    let checkpoint = input.checkpoint
+                    if checkpoint == priorCheckpoint {
+
+                        var results: [Value] = []
+                        results.reserveCapacity(resultHandles.count)
+                        for resultHandle in resultHandles {
+                            results.append(arena.release(resultHandle))
+                        }
+                        let finalValue = finalize.finalize(using: program.captures, results)
+                        pendingHandle = arena.allocate(finalValue)
+                    } else {
+                        frames.push(
+                            .many(
+                                child: child,
+                                savedCheckpoint: checkpoint,
+                                resultHandles: resultHandles,
+                                finalize: finalize
+                            )
+                        )
+                        current = child
+                    }
+
+                case .fold(let child, let priorCheckpoint, let accHandle, let combine):
+                    let acc = arena.release(accHandle)
+                    let newAcc = combine.combine(using: program.captures, acc, value)
+                    let checkpoint = input.checkpoint
+                    if checkpoint == priorCheckpoint {
+
+                        pendingHandle = arena.allocate(newAcc)
+                    } else {
+                        frames.push(
+                            .fold(
+                                child: child,
+                                savedCheckpoint: checkpoint,
+                                accumulatorHandle: arena.allocate(newAcc),
+                                combine: combine
+                            )
+                        )
+                        current = child
+                    }
+
+                case .optional(_, let wrapSome, let noneHandle):
+                    _ = arena.release(noneHandle)
+                    let wrapped = wrapSome.apply(using: program.captures, value)
+                    pendingHandle = arena.allocate(wrapped)
+
+                case .recursiveExit:
+                    depth -= 1
+                    pendingHandle = arena.allocate(value)
+
+                case .extra(.memoization(let node, let startPosition)):
+
+                    let key = MemoKey(position: startPosition, node: node)
+                    let entry = MemoEntry.success(output: value, end: input.checkpoint)
+                    memoization.store(entry, for: key)
+                    pendingHandle = arena.allocate(value)
+                }
+
+                continue
+            }
+
+            let memoKey = MemoKey(position: input.checkpoint, node: current.underlying)
+            if let cached = memoization.lookup(memoKey) {
+                switch cached {
+                case .success(let output, let endPosition):
+
+                    input.seek(to: endPosition)
+                    pendingHandle = arena.allocate(output)
+                    continue
+
+                case .failure(let storedError):
+
+                    switch try handleMemoizedFailure(
+                        error: storedError,
+                        frames: &frames,
+                        arena: &arena,
+                        input: &input,
+                        depth: &depth,
+                        memoization: &memoization
+                    ) {
+                    case .continueWith(let recovered):
+                        current = recovered.retag(Node.self)
+                        continue
+
+                    case .handleReady(let handle):
+                        pendingHandle = handle
+                        continue
+
+                    case .propagate:
+
+                        guard let typedFailure = storedError as? Failure else {
+                            preconditionFailure(
+                                """
+                                Internal error: cached failure type mismatch — every \
+                                `.failure` entry must be `Failure`-typed by construction \
+                                (see `.extra(.memoization)`, above)
+                                """
+                            )
+                        }
+                        throw typedFailure
+                    }
+                }
+            }
+
+            frames.push(
+                .extra(.memoization(node: current.underlying, startPosition: input.checkpoint))
+            )
+
+            let node = program[current]
+
+            switch node {
+            case .leaf(let leaf):
+                do throws(Failure) {
+                    let value = try leaf.run(&input)
+                    pendingHandle = arena.allocate(value)
+                } catch {
+                    switch try handleMemoizedFailure(
+                        error: error,
+                        frames: &frames,
+                        arena: &arena,
+                        input: &input,
+                        depth: &depth,
+                        memoization: &memoization
+                    ) {
+                    case .continueWith(let recovered):
+                        current = recovered.retag(Node.self)
+
+                    case .handleReady(let handle):
+                        pendingHandle = handle
+
+                    case .propagate:
+                        throw error
+                    }
+                }
+
+            case .pure(let value):
+                pendingHandle = arena.allocate(value)
+
+            case .map(let child, let transform):
+                frames.push(.map(transform: transform))
+                current = child
+
+            case .tryMap(let child, let transform):
+                frames.push(.tryMap(transform: transform))
+                current = child
+
+            case .flatMap(let child, let next):
+                frames.push(.flatMap(next: next))
+                current = child
+
+            case .sequence(let a, let b, let combine):
+                frames.push(.sequence(.second(b: b, combine: combine)))
+                current = a
+
+            case .oneOf(let alternatives):
+                guard !alternatives.isEmpty else {
+                    fatalError("Empty oneOf")
+                }
+                let checkpoint = input.checkpoint
+                if alternatives.count > 1 {
+                    frames.push(
+                        .oneOf(
+                            alternatives: alternatives,
+                            index: 1,
+                            savedCheckpoint: checkpoint
+                        )
+                    )
+                }
+                current = alternatives[0]
+
+            case .many(let child, let finalize):
+                let checkpoint = input.checkpoint
+                frames.push(
+                    .many(
+                        child: child,
+                        savedCheckpoint: checkpoint,
+                        resultHandles: [],
+                        finalize: finalize
+                    )
+                )
+                current = child
+
+            case .fold(let child, let initial, let combine):
+                let checkpoint = input.checkpoint
+                frames.push(
+                    .fold(
+                        child: child,
+                        savedCheckpoint: checkpoint,
+                        accumulatorHandle: arena.allocate(initial),
+                        combine: combine
+                    )
+                )
+                current = child
+
+            case .optional(let child, let wrapSome, let noneValue):
+                let checkpoint = input.checkpoint
+                let noneHandle = arena.allocate(noneValue)
+                frames.push(
+                    .optional(
+                        savedCheckpoint: checkpoint,
+                        wrapSome: wrapSome,
+                        noneHandle: noneHandle
+                    )
+                )
+                current = child
+
+            case .ref(let target):
+                if let limit = program.maxDepth, depth >= limit {
+                    let error = Parser.Parser.Machine.Runtime.Error.depthExceeded(
+                        limit: limit
+                    )
+                    switch try handleMemoizedFailure(
+                        error: error,
+                        frames: &frames,
+                        arena: &arena,
+                        input: &input,
+                        depth: &depth,
+                        memoization: &memoization
+                    ) {
+                    case .continueWith(let recovered):
+                        current = recovered.retag(Node.self)
+
+                    case .handleReady(let handle):
+                        pendingHandle = handle
+
+                    case .propagate:
+
+                        if let depthFailure {
+                            throw depthFailure(limit)
+                        }
+
+                        if let failure = error as? Failure {
+                            throw failure
+                        }
+                        fatalError("Depth exceeded without an onDepthExceeded handler configured.")
+                    }
+                } else {
+                    depth += 1
+                    frames.push(.recursiveExit)
+                    current = target
+                }
+
+            case .hole:
+                fatalError("Unpatched hole in program")
+            }
+        }
+    }
+}

@@ -1,6 +1,6 @@
-import Parser_Machine_Combinator_Primitives
-import Parser_Machine_Compile_Primitives
-import Parser_Primitives_Test_Support
+import Parser_Machine_Combinator
+import Parser_Machine_Compile
+import Parser_Test_Support
 import Testing
 
 @Suite("Parser.Machine.Equivalence")

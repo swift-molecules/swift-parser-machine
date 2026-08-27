@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-parser-machine-primitives",
+    name: "swift-parser-machine",
     platforms: [
         .macOS(.v27),
         .iOS(.v27),
@@ -13,185 +13,185 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "Parser Machine Primitives",
-            targets: ["Parser Machine Primitives"]
+            name: "Parser Machine",
+            targets: ["Parser Machine"]
         ),
         .library(
-            name: "Parser Machine Program Primitives",
-            targets: ["Parser Machine Program Primitives"]
+            name: "Parser Machine Program",
+            targets: ["Parser Machine Program"]
         ),
         .library(
-            name: "Parser Machine Runtime Primitives",
-            targets: ["Parser Machine Runtime Primitives"]
+            name: "Parser Machine Runtime",
+            targets: ["Parser Machine Runtime"]
         ),
         .library(
-            name: "Parser Machine Memoization Primitives",
-            targets: ["Parser Machine Memoization Primitives"]
+            name: "Parser Machine Memoization",
+            targets: ["Parser Machine Memoization"]
         ),
         .library(
-            name: "Parser Machine Compile Primitives",
-            targets: ["Parser Machine Compile Primitives"]
+            name: "Parser Machine Compile",
+            targets: ["Parser Machine Compile"]
         ),
         .library(
-            name: "Parser Machine Combinator Primitives",
-            targets: ["Parser Machine Combinator Primitives"]
+            name: "Parser Machine Combinator",
+            targets: ["Parser Machine Combinator"]
         ),
         .library(
-            name: "Parser Machine Parse Primitives",
-            targets: ["Parser Machine Parse Primitives"]
+            name: "Parser Machine Parse",
+            targets: ["Parser Machine Parse"]
         ),
         .library(
-            name: "Parser Machine Primitives Test Support",
-            targets: ["Parser Machine Primitives Test Support"]
+            name: "Parser Machine Test Support",
+            targets: ["Parser Machine Test Support"]
         ),
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-primitives/swift-parser-primitives.git",
+            url: "https://github.com/swift-molecules/swift-parser.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-stack-primitives.git",
+            url: "https://github.com/swift-molecules/swift-stack.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-tagged-primitives.git",
+            url: "https://github.com/swift-molecules/swift-tagged.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-machine-primitives.git",
+            url: "https://github.com/swift-molecules/swift-machine.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-input-primitives.git",
+            url: "https://github.com/swift-molecules/swift-input.git",
             branch: "main"
         ),
     ],
     targets: [
 
         .target(
-            name: "Parser Machine Program Primitives",
+            name: "Parser Machine Program",
             dependencies: [
-                .product(name: "Parser Primitives", package: "swift-parser-primitives"),
-                .product(name: "Tagged Primitives", package: "swift-tagged-primitives"),
-                .product(name: "Machine Primitives", package: "swift-machine-primitives"),
-                .product(name: "Input Primitives", package: "swift-input-primitives"),
+                .product(name: "Parser", package: "swift-parser"),
+                .product(name: "Tagged", package: "swift-tagged"),
+                .product(name: "Machine", package: "swift-machine"),
+                .product(name: "Input", package: "swift-input"),
             ]
         ),
 
         .target(
-            name: "Parser Machine Runtime Primitives",
+            name: "Parser Machine Runtime",
             dependencies: [
-                "Parser Machine Program Primitives",
-                .product(name: "Parser Primitives", package: "swift-parser-primitives"),
-                .product(name: "Tagged Primitives", package: "swift-tagged-primitives"),
-                .product(name: "Machine Primitives", package: "swift-machine-primitives"),
-                .product(name: "Stack Primitives", package: "swift-stack-primitives"),
-                .product(name: "Input Primitives", package: "swift-input-primitives"),
+                "Parser Machine Program",
+                .product(name: "Parser", package: "swift-parser"),
+                .product(name: "Tagged", package: "swift-tagged"),
+                .product(name: "Machine", package: "swift-machine"),
+                .product(name: "Stack", package: "swift-stack"),
+                .product(name: "Input", package: "swift-input"),
             ]
         ),
 
         .target(
-            name: "Parser Machine Memoization Primitives",
+            name: "Parser Machine Memoization",
             dependencies: [
-                "Parser Machine Program Primitives",
-                "Parser Machine Runtime Primitives",
-                .product(name: "Input Primitives", package: "swift-input-primitives"),
+                "Parser Machine Program",
+                "Parser Machine Runtime",
+                .product(name: "Input", package: "swift-input"),
             ]
         ),
 
         .target(
-            name: "Parser Machine Compile Primitives",
+            name: "Parser Machine Compile",
             dependencies: [
-                "Parser Machine Program Primitives",
-                "Parser Machine Runtime Primitives",
-                .product(name: "Input Primitives", package: "swift-input-primitives"),
+                "Parser Machine Program",
+                "Parser Machine Runtime",
+                .product(name: "Input", package: "swift-input"),
             ]
         ),
 
         .target(
-            name: "Parser Machine Combinator Primitives",
+            name: "Parser Machine Combinator",
             dependencies: [
-                "Parser Machine Program Primitives",
-                "Parser Machine Runtime Primitives",
-                .product(name: "Input Primitives", package: "swift-input-primitives"),
+                "Parser Machine Program",
+                "Parser Machine Runtime",
+                .product(name: "Input", package: "swift-input"),
             ]
         ),
 
         .target(
-            name: "Parser Machine Parse Primitives",
+            name: "Parser Machine Parse",
             dependencies: [
-                "Parser Machine Runtime Primitives",
-                "Parser Machine Memoization Primitives",
-                "Parser Machine Compile Primitives",
-                .product(name: "Input Primitives", package: "swift-input-primitives"),
+                "Parser Machine Runtime",
+                "Parser Machine Memoization",
+                "Parser Machine Compile",
+                .product(name: "Input", package: "swift-input"),
             ]
         ),
 
         .target(
-            name: "Parser Machine Primitives",
+            name: "Parser Machine",
             dependencies: [
-                "Parser Machine Program Primitives",
-                "Parser Machine Runtime Primitives",
-                "Parser Machine Memoization Primitives",
-                "Parser Machine Compile Primitives",
-                "Parser Machine Combinator Primitives",
-                "Parser Machine Parse Primitives",
+                "Parser Machine Program",
+                "Parser Machine Runtime",
+                "Parser Machine Memoization",
+                "Parser Machine Compile",
+                "Parser Machine Combinator",
+                "Parser Machine Parse",
             ]
         ),
 
         .testTarget(
-            name: "Parser Machine Program Primitives Tests",
+            name: "Parser Machine Program Tests",
             dependencies: [
-                "Parser Machine Program Primitives"
+                "Parser Machine Program"
             ]
         ),
 
         .testTarget(
-            name: "Parser Machine Memoization Primitives Tests",
+            name: "Parser Machine Memoization Tests",
             dependencies: [
-                "Parser Machine Memoization Primitives",
+                "Parser Machine Memoization",
                 .product(
-                    name: "Tagged Primitives Test Support",
-                    package: "swift-tagged-primitives"
+                    name: "Tagged Test Support",
+                    package: "swift-tagged"
                 ),
             ]
         ),
 
         .testTarget(
-            name: "Parser Machine Compile Primitives Tests",
+            name: "Parser Machine Compile Tests",
             dependencies: [
-                "Parser Machine Compile Primitives",
-                "Parser Machine Combinator Primitives",
+                "Parser Machine Compile",
+                "Parser Machine Combinator",
                 .product(
-                    name: "Parser Primitives Test Support",
-                    package: "swift-parser-primitives"
+                    name: "Parser Test Support",
+                    package: "swift-parser"
                 ),
             ]
         ),
 
         .testTarget(
-            name: "Parser Machine Combinator Primitives Tests",
+            name: "Parser Machine Combinator Tests",
             dependencies: [
-                "Parser Machine Combinator Primitives",
-                "Parser Machine Parse Primitives",
+                "Parser Machine Combinator",
+                "Parser Machine Parse",
                 .product(
-                    name: "Parser Primitives Test Support",
-                    package: "swift-parser-primitives"
+                    name: "Parser Test Support",
+                    package: "swift-parser"
                 ),
             ]
         ),
 
         .testTarget(
-            name: "Parser Machine Parse Primitives Tests",
+            name: "Parser Machine Parse Tests",
             dependencies: [
-                "Parser Machine Parse Primitives",
-                "Parser Machine Combinator Primitives",
+                "Parser Machine Parse",
+                "Parser Machine Combinator",
 
-                "Parser Machine Memoization Primitives",
+                "Parser Machine Memoization",
                 .product(
-                    name: "Parser Primitives Test Support",
-                    package: "swift-parser-primitives"
+                    name: "Parser Test Support",
+                    package: "swift-parser"
                 ),
             ]
         ),
@@ -199,26 +199,26 @@ let package = Package(
         .testTarget(
             name: "Parser Machine Equivalence Tests",
             dependencies: [
-                "Parser Machine Compile Primitives",
-                "Parser Machine Combinator Primitives",
+                "Parser Machine Compile",
+                "Parser Machine Combinator",
                 .product(
-                    name: "Parser Primitives Test Support",
-                    package: "swift-parser-primitives"
+                    name: "Parser Test Support",
+                    package: "swift-parser"
                 ),
             ]
         ),
 
         .target(
-            name: "Parser Machine Primitives Test Support",
+            name: "Parser Machine Test Support",
             dependencies: [
-                "Parser Machine Primitives",
+                "Parser Machine",
                 .product(
-                    name: "Parser Primitives Test Support",
-                    package: "swift-parser-primitives"
+                    name: "Parser Test Support",
+                    package: "swift-parser"
                 ),
                 .product(
-                    name: "Tagged Primitives Test Support",
-                    package: "swift-tagged-primitives"
+                    name: "Tagged Test Support",
+                    package: "swift-tagged"
                 ),
             ],
             path: "Tests/Support"

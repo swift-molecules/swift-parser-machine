@@ -1,5 +1,5 @@
 import Parser_Machine_Combinator
-import Parser_Machine_Compile
+import Parser_Machine_Parse
 import Parser_Test_Support
 
 typealias Input = Parser.Test.Input
@@ -49,17 +49,4 @@ func makeInput(_ bytes: [UInt8]) -> Input {
 
 func makeInput(_ string: Swift.String) -> Input {
     Input(utf8: string)
-}
-
-extension Input {
-    func remainingBytes() -> [UInt8] {
-        var copy = self
-        var result: [UInt8] = []
-        while !copy.isEmpty {
-
-            guard let element = try? copy.advance() else { break }
-            result.append(element)
-        }
-        return result
-    }
 }
