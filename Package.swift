@@ -47,7 +47,7 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-molecules/swift-parser.git",
+            url: "https://github.com/swift-atoms/swift-parser.git",
             branch: "main"
         ),
         .package(
@@ -55,7 +55,7 @@ let package = Package(
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-tagged.git",
+            url: "https://github.com/swift-atoms/swift-tagged.git",
             branch: "main"
         ),
         .package(
@@ -63,7 +63,19 @@ let package = Package(
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-input.git",
+            url: "https://github.com/swift-atoms/swift-checkpoint.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-atoms/swift-cursor.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-molecules/swift-cursor-parser.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-atoms/swift-iterator.git",
             branch: "main"
         ),
     ],
@@ -75,7 +87,10 @@ let package = Package(
                 .product(name: "Parser", package: "swift-parser"),
                 .product(name: "Tagged", package: "swift-tagged"),
                 .product(name: "Machine", package: "swift-machine"),
-                .product(name: "Input", package: "swift-input"),
+                .product(name: "Checkpoint", package: "swift-checkpoint"),
+                .product(name: "Cursor", package: "swift-cursor"),
+                .product(name: "Iterator", package: "swift-iterator"),
+                .product(name: "Iterator Protocol", package: "swift-iterator"),
             ]
         ),
 
@@ -87,7 +102,10 @@ let package = Package(
                 .product(name: "Tagged", package: "swift-tagged"),
                 .product(name: "Machine", package: "swift-machine"),
                 .product(name: "Stack", package: "swift-stack"),
-                .product(name: "Input", package: "swift-input"),
+                .product(name: "Checkpoint", package: "swift-checkpoint"),
+                .product(name: "Cursor", package: "swift-cursor"),
+                .product(name: "Iterator", package: "swift-iterator"),
+                .product(name: "Iterator Protocol", package: "swift-iterator"),
             ]
         ),
 
@@ -96,7 +114,10 @@ let package = Package(
             dependencies: [
                 "Parser Machine Program",
                 "Parser Machine Runtime",
-                .product(name: "Input", package: "swift-input"),
+                .product(name: "Checkpoint", package: "swift-checkpoint"),
+                .product(name: "Cursor", package: "swift-cursor"),
+                .product(name: "Iterator", package: "swift-iterator"),
+                .product(name: "Iterator Protocol", package: "swift-iterator"),
             ]
         ),
 
@@ -105,7 +126,10 @@ let package = Package(
             dependencies: [
                 "Parser Machine Program",
                 "Parser Machine Runtime",
-                .product(name: "Input", package: "swift-input"),
+                .product(name: "Checkpoint", package: "swift-checkpoint"),
+                .product(name: "Cursor", package: "swift-cursor"),
+                .product(name: "Iterator", package: "swift-iterator"),
+                .product(name: "Iterator Protocol", package: "swift-iterator"),
             ]
         ),
 
@@ -114,7 +138,10 @@ let package = Package(
             dependencies: [
                 "Parser Machine Program",
                 "Parser Machine Runtime",
-                .product(name: "Input", package: "swift-input"),
+                .product(name: "Checkpoint", package: "swift-checkpoint"),
+                .product(name: "Cursor", package: "swift-cursor"),
+                .product(name: "Iterator", package: "swift-iterator"),
+                .product(name: "Iterator Protocol", package: "swift-iterator"),
             ]
         ),
 
@@ -124,7 +151,10 @@ let package = Package(
                 "Parser Machine Runtime",
                 "Parser Machine Memoization",
                 "Parser Machine Compile",
-                .product(name: "Input", package: "swift-input"),
+                .product(name: "Checkpoint", package: "swift-checkpoint"),
+                .product(name: "Cursor", package: "swift-cursor"),
+                .product(name: "Iterator", package: "swift-iterator"),
+                .product(name: "Iterator Protocol", package: "swift-iterator"),
             ]
         ),
 
@@ -164,8 +194,8 @@ let package = Package(
                 "Parser Machine Compile",
                 "Parser Machine Combinator",
                 .product(
-                    name: "Parser Test Support",
-                    package: "swift-parser"
+                    name: "Cursor Parser Test Support",
+                    package: "swift-cursor-parser"
                 ),
             ]
         ),
@@ -176,8 +206,8 @@ let package = Package(
                 "Parser Machine Combinator",
                 "Parser Machine Parse",
                 .product(
-                    name: "Parser Test Support",
-                    package: "swift-parser"
+                    name: "Cursor Parser Test Support",
+                    package: "swift-cursor-parser"
                 ),
             ]
         ),
@@ -190,8 +220,8 @@ let package = Package(
 
                 "Parser Machine Memoization",
                 .product(
-                    name: "Parser Test Support",
-                    package: "swift-parser"
+                    name: "Cursor Parser Test Support",
+                    package: "swift-cursor-parser"
                 ),
             ]
         ),
@@ -202,8 +232,8 @@ let package = Package(
                 "Parser Machine Compile",
                 "Parser Machine Combinator",
                 .product(
-                    name: "Parser Test Support",
-                    package: "swift-parser"
+                    name: "Cursor Parser Test Support",
+                    package: "swift-cursor-parser"
                 ),
             ]
         ),
@@ -213,8 +243,8 @@ let package = Package(
             dependencies: [
                 "Parser Machine",
                 .product(
-                    name: "Parser Test Support",
-                    package: "swift-parser"
+                    name: "Cursor Parser Test Support",
+                    package: "swift-cursor-parser"
                 ),
                 .product(
                     name: "Tagged Test Support",
