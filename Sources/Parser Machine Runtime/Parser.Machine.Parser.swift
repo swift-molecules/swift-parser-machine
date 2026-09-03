@@ -1,4 +1,7 @@
-public import Input
+public import Checkpoint
+public import Cursor
+public import Iterator
+public import Iterator_Protocol
 public import Machine
 public import Parser_Machine_Program
 import Parser
@@ -6,7 +9,7 @@ import Parser
 extension Parser.Machine {
 
     public struct Parser<
-        Input: Input.Input.`Protocol` & ~Copyable,
+        Input: Cursor.`Protocol` & ~Copyable,
         Output,
         Failure: Swift.Error
     >: Parser.Parser.`Protocol` {

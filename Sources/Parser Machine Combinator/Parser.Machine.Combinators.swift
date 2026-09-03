@@ -1,4 +1,7 @@
-public import Input
+public import Checkpoint
+public import Cursor
+public import Iterator
+public import Iterator_Protocol
 internal import Machine
 import Parser
 internal import Tagged
@@ -10,7 +13,7 @@ extension Parser.Machine {
         in builder: inout Builder<Input, Failure>
     ) -> Expression<Input, Failure, Output>
     where
-        Input: Input.Input.`Protocol` & ~Copyable,
+        Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
     {
         let node = Node<Input, Failure>.pure(Value.make(value))
@@ -53,7 +56,7 @@ extension Parser.Machine {
         in builder: inout Builder<Input, Failure>
     ) -> Expression<Input, Failure, NewOutput>
     where
-        Input: Input.Input.`Protocol` & ~Copyable,
+        Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
     {
         let captureID = builder.captures.insert(transform)
@@ -95,7 +98,7 @@ extension Parser.Machine {
         in builder: inout Builder<Input, Failure>
     ) -> Expression<Input, Failure, C>
     where
-        Input: Input.Input.`Protocol` & ~Copyable,
+        Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
     {
         let captureID = builder.captures.insert(combine)
@@ -116,7 +119,7 @@ extension Parser.Machine {
         in builder: inout Builder<Input, Failure>
     ) -> Expression<Input, Failure, Output>
     where
-        Input: Input.Input.`Protocol` & ~Copyable,
+        Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
     {
         let nodeIDs = alternatives.map { $0.node }
@@ -133,7 +136,7 @@ extension Parser.Machine {
         in builder: inout Builder<Input, Failure>
     ) -> Expression<Input, Failure, [T]>
     where
-        Input: Input.Input.`Protocol` & ~Copyable,
+        Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
     {
         let node = Node<Input, Failure>.many(
@@ -152,7 +155,7 @@ extension Parser.Machine {
         in builder: inout Builder<Input, Failure>
     ) -> Expression<Input, Failure, T?>
     where
-        Input: Input.Input.`Protocol` & ~Copyable,
+        Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
     {
         let wrapSome: (T) -> T? = { Swift.Optional.some($0) }

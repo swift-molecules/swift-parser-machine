@@ -1,11 +1,14 @@
-public import Input
+public import Checkpoint
+public import Cursor
+public import Iterator
+public import Iterator_Protocol
 public import Machine
 import Parser
 
 extension Parser.Machine {
 
     public struct Expression<
-        Input: Input.Input.`Protocol` & ~Copyable,
+        Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error,
         Output
     > {

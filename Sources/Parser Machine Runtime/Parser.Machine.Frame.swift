@@ -1,4 +1,7 @@
-public import Input
+public import Checkpoint
+public import Cursor
+public import Iterator
+public import Iterator_Protocol
 public import Machine
 public import Parser_Machine_Program
 import Parser
@@ -6,7 +9,7 @@ import Parser
 extension Parser.Machine {
 
     public typealias Frame<
-        Input: Input.Input.`Protocol` & ~Copyable,
+        Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
     > = Machine.Machine.Frame<
         Node<Input, Failure>.ID,

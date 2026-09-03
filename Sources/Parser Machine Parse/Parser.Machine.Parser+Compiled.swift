@@ -1,8 +1,11 @@
-public import Input
+public import Checkpoint
+public import Cursor
+public import Iterator
+public import Iterator_Protocol
 
 extension Parser.Parse
 where
-    P.Input: Input.Input.`Protocol`,
+    P.Input: Cursor.`Protocol`,
     P.Failure: Swift.Error
 {
 
@@ -30,7 +33,7 @@ where
 extension Parser.Parse
 where
     P: ~Copyable,
-    P.Input: Input.Input.`Protocol`,
+    P.Input: Cursor.`Protocol`,
     P.Failure: Swift.Error
 {
 

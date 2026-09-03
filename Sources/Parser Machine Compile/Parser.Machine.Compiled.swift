@@ -1,4 +1,7 @@
-public import Input
+public import Checkpoint
+public import Cursor
+public import Iterator
+public import Iterator_Protocol
 public import Machine
 
 extension Parser.Machine {
@@ -7,7 +10,7 @@ extension Parser.Machine {
         P: Parser.Parser.`Protocol`<P.Input, P.Output, P.Failure> & ~Copyable
     >: Copyable
     where
-        P.Input: Input.Input.`Protocol`<P.Input.Element>,
+        P.Input: Cursor.`Protocol`,
         P.Failure: Swift.Error
     {
         @usableFromInline

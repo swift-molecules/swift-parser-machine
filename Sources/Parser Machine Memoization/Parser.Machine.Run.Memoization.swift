@@ -15,7 +15,7 @@ extension Parser.Machine {
         depthFailure: ((Int) -> Failure)? = nil
     ) throws(Failure) -> Output
     where
-        Input: Input.Input.`Protocol` & ~Copyable,
+        Input: Cursor.`Protocol` & ~Copyable,
         Input.Checkpoint: Hashable,
         Failure: Swift.Error
     {

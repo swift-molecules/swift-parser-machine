@@ -14,7 +14,7 @@ extension Parser.Machine {
         depthFailure: ((Int) -> Failure)? = nil
     ) throws(Failure) -> Output
     where
-        Input: Input.Input.`Protocol` & ~Copyable,
+        Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
     {
         typealias Value = Parser.Parser.Machine.Value
