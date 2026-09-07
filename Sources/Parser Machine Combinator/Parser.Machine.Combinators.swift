@@ -1,7 +1,6 @@
 public import Checkpoint
 public import Cursor
 public import Iterator
-public import Iterator_Protocol
 internal import Machine
 import Parser
 internal import Tagged

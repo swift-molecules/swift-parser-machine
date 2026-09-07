@@ -1,7 +1,6 @@
 public import Checkpoint
 public import Cursor
 public import Iterator
-public import Iterator_Protocol
 
 extension Parser.Machine {
 

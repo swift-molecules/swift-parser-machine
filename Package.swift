@@ -90,7 +90,6 @@ let package = Package(
                 .product(name: "Checkpoint", package: "swift-checkpoint"),
                 .product(name: "Cursor", package: "swift-cursor"),
                 .product(name: "Iterator", package: "swift-iterator"),
-                .product(name: "Iterator Protocol", package: "swift-iterator"),
             ]
         ),
 
@@ -105,7 +104,6 @@ let package = Package(
                 .product(name: "Checkpoint", package: "swift-checkpoint"),
                 .product(name: "Cursor", package: "swift-cursor"),
                 .product(name: "Iterator", package: "swift-iterator"),
-                .product(name: "Iterator Protocol", package: "swift-iterator"),
             ]
         ),
 
@@ -117,7 +115,6 @@ let package = Package(
                 .product(name: "Checkpoint", package: "swift-checkpoint"),
                 .product(name: "Cursor", package: "swift-cursor"),
                 .product(name: "Iterator", package: "swift-iterator"),
-                .product(name: "Iterator Protocol", package: "swift-iterator"),
             ]
         ),
 
@@ -129,7 +126,6 @@ let package = Package(
                 .product(name: "Checkpoint", package: "swift-checkpoint"),
                 .product(name: "Cursor", package: "swift-cursor"),
                 .product(name: "Iterator", package: "swift-iterator"),
-                .product(name: "Iterator Protocol", package: "swift-iterator"),
             ]
         ),
 
@@ -141,7 +137,6 @@ let package = Package(
                 .product(name: "Checkpoint", package: "swift-checkpoint"),
                 .product(name: "Cursor", package: "swift-cursor"),
                 .product(name: "Iterator", package: "swift-iterator"),
-                .product(name: "Iterator Protocol", package: "swift-iterator"),
             ]
         ),
 
@@ -154,7 +149,6 @@ let package = Package(
                 .product(name: "Checkpoint", package: "swift-checkpoint"),
                 .product(name: "Cursor", package: "swift-cursor"),
                 .product(name: "Iterator", package: "swift-iterator"),
-                .product(name: "Iterator Protocol", package: "swift-iterator"),
             ]
         ),
 
