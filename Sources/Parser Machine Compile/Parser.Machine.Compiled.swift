@@ -6,7 +6,7 @@ public import Machine
 extension Parser.Machine {
 
     public struct Compiled<
-        P: Parser.Parser.`Protocol`<P.Input, P.Output, P.Failure> & ~Copyable
+        P: Parser.Parsing<P.Input, P.Output, P.Failure> & ~Copyable
     >: Copyable
     where
         P.Input: Cursor.`Protocol`,
@@ -92,7 +92,7 @@ extension Parser.Machine.Compiled.Cache where P: ~Copyable {
     }
 }
 
-extension Parser.Machine.Compiled: Parser.Parser.`Protocol` where P: ~Copyable {
+extension Parser.Machine.Compiled: Parser.Parsing where P: ~Copyable {
 
     public typealias Input = P.Input
 

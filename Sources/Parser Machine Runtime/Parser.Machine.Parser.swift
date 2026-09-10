@@ -11,7 +11,7 @@ extension Parser.Machine {
         Input: Cursor.`Protocol` & ~Copyable,
         Output,
         Failure: Swift.Error
-    >: Parser.Parser.`Protocol` {
+    >: Parser.Parsing {
         package let program: Program<Input, Failure>
 
         package let root: Node<Input, Failure>.ID

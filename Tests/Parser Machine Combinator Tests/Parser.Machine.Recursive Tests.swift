@@ -3,7 +3,7 @@ import Parser_Machine_Parse
 import Parser_Test_Support
 import Testing
 
-private struct OpenParen: Parser.`Protocol`, Sendable {}
+private struct OpenParen: Parsing, Sendable {}
 
 extension OpenParen {
     enum Error: Swift.Error, Sendable { case expected }
@@ -15,7 +15,7 @@ extension OpenParen {
     }
 }
 
-private struct CloseParen: Parser.`Protocol`, Sendable {}
+private struct CloseParen: Parsing, Sendable {}
 
 extension CloseParen {
     enum Error: Swift.Error, Sendable { case expected }
@@ -75,7 +75,7 @@ private enum XMLContent: Sendable, Equatable {
     case element(XMLElement)
 }
 
-private struct OpenBracket: Parser.`Protocol`, Sendable {}
+private struct OpenBracket: Parsing, Sendable {}
 
 extension OpenBracket {
     enum Error: Swift.Error, Sendable { case expected }
@@ -86,7 +86,7 @@ extension OpenBracket {
     }
 }
 
-private struct CloseBracket: Parser.`Protocol`, Sendable {}
+private struct CloseBracket: Parsing, Sendable {}
 
 extension CloseBracket {
     enum Error: Swift.Error, Sendable { case expected }
@@ -97,7 +97,7 @@ extension CloseBracket {
     }
 }
 
-private struct SlashClose: Parser.`Protocol`, Sendable {}
+private struct SlashClose: Parsing, Sendable {}
 
 extension SlashClose {
     enum Error: Swift.Error, Sendable { case expected }
@@ -115,7 +115,7 @@ private struct StartTagOutput: Sendable {
     var isEmpty: Bool
 }
 
-private struct ParseOpen: Parser.`Protocol`, Sendable {}
+private struct ParseOpen: Parsing, Sendable {}
 
 extension ParseOpen {
     enum Error: Swift.Error, Sendable { case expected }
@@ -135,7 +135,7 @@ extension ParseOpen {
     }
 }
 
-private struct ParseClose: Parser.`Protocol`, Sendable {}
+private struct ParseClose: Parsing, Sendable {}
 
 extension ParseClose {
     enum Error: Swift.Error, Sendable { case expected }

@@ -9,7 +9,7 @@ extension Parser.Machine {
 
 extension Parser.Machine.Compile {
 
-    public struct Witness<P: Parser.Parser.`Protocol` & ~Copyable>
+    public struct Witness<P: Parser.Parsing & ~Copyable>
     where
         P.Input: Cursor.`Protocol`,
         P.Failure: Swift.Error

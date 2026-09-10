@@ -275,7 +275,7 @@ extension ParserMachineEquivalenceTests.Caching {
     }
 }
 
-private struct OpenParen: Parser.`Protocol`, Sendable {}
+private struct OpenParen: Parsing, Sendable {}
 
 extension OpenParen {
     enum Error: Swift.Error, Sendable { case expected }
@@ -287,7 +287,7 @@ extension OpenParen {
     }
 }
 
-private struct CloseParen: Parser.`Protocol`, Sendable {}
+private struct CloseParen: Parsing, Sendable {}
 
 extension CloseParen {
     enum Error: Swift.Error, Sendable { case expected }

@@ -4,7 +4,7 @@ import Parser_Test_Support
 
 typealias Input = Parser.Test.Input
 
-struct ByteParser: Parser.`Protocol`, Sendable {}
+struct ByteParser: Parsing, Sendable {}
 
 extension ByteParser {
     enum Error: Swift.Error, Sendable {
@@ -21,7 +21,7 @@ extension ByteParser {
     }
 }
 
-struct MatchByte: Parser.`Protocol`, Sendable {
+struct MatchByte: Parsing, Sendable {
     let expected: UInt8
 }
 

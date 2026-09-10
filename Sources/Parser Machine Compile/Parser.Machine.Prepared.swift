@@ -5,7 +5,7 @@ public import Machine
 
 extension Parser.Machine {
 
-    public struct Prepared<P: Parser.Parser.`Protocol` & ~Copyable>
+    public struct Prepared<P: Parser.Parsing & ~Copyable>
     where
         P.Input: Cursor.`Protocol`,
         P.Failure: Swift.Error
@@ -34,7 +34,7 @@ extension Parser.Machine {
     }
 }
 
-extension Parser.Machine.Prepared: Parser.Parser.`Protocol` where P: ~Copyable {
+extension Parser.Machine.Prepared: Parser.Parsing where P: ~Copyable {
 
     public typealias Input = P.Input
 
