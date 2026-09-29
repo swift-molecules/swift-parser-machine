@@ -1,4 +1,4 @@
-import Machine_Value
+import Machine
 import Parser_Machine_Memoization
 import Tagged_Test_Support
 import Testing

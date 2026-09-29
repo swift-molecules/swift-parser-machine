@@ -48,8 +48,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/swift-atoms/swift-parser.git",
-            branch: "main"
-        ),
+            branch: "main", traits: ["CollectionLeaves"]),
         .package(
             url: "https://github.com/swift-molecules/swift-stack.git",
             branch: "main"
@@ -68,10 +67,6 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/swift-atoms/swift-cursor.git",
-            branch: "main"
-        ),
-        .package(
-            url: "https://github.com/swift-molecules/swift-cursor-parser.git",
             branch: "main"
         ),
         .package(
@@ -189,8 +184,10 @@ let package = Package(
                 "Parser Machine Combinator",
                 .product(
                     name: "Cursor Parser Test Support",
-                    package: "swift-cursor-parser"
+                    package: "swift-parser"
                 ),
+                .product(name: "Collection Parser Test Support", package: "swift-parser"),
+                .product(name: "Parser Test Support", package: "swift-parser"),
             ]
         ),
 
@@ -201,8 +198,10 @@ let package = Package(
                 "Parser Machine Parse",
                 .product(
                     name: "Cursor Parser Test Support",
-                    package: "swift-cursor-parser"
+                    package: "swift-parser"
                 ),
+                .product(name: "Collection Parser Test Support", package: "swift-parser"),
+                .product(name: "Parser Test Support", package: "swift-parser"),
             ]
         ),
 
@@ -215,8 +214,10 @@ let package = Package(
                 "Parser Machine Memoization",
                 .product(
                     name: "Cursor Parser Test Support",
-                    package: "swift-cursor-parser"
+                    package: "swift-parser"
                 ),
+                .product(name: "Collection Parser Test Support", package: "swift-parser"),
+                .product(name: "Parser Test Support", package: "swift-parser"),
             ]
         ),
 
@@ -227,8 +228,10 @@ let package = Package(
                 "Parser Machine Combinator",
                 .product(
                     name: "Cursor Parser Test Support",
-                    package: "swift-cursor-parser"
+                    package: "swift-parser"
                 ),
+                .product(name: "Collection Parser Test Support", package: "swift-parser"),
+                .product(name: "Parser Test Support", package: "swift-parser"),
             ]
         ),
 
@@ -238,7 +241,7 @@ let package = Package(
                 "Parser Machine",
                 .product(
                     name: "Cursor Parser Test Support",
-                    package: "swift-cursor-parser"
+                    package: "swift-parser"
                 ),
                 .product(
                     name: "Tagged Test Support",

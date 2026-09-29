@@ -1,4 +1,4 @@
-import Machine_Node
+import Machine
 import Parser_Machine_Combinator
 import Parser_Machine_Memoization
 import Parser_Machine_Parse

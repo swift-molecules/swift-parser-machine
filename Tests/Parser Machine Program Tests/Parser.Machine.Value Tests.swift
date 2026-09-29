@@ -1,4 +1,4 @@
-import Machine_Value
+import Machine
 import Parser_Machine_Program
 import Testing
 

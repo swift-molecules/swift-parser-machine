@@ -1,8 +1,8 @@
 import Parser_Machine_Combinator
 import Parser_Machine_Compile
-import Parser_Test_Support
+import Collection_Parser_Test_Support
 
-typealias Input = Parser.Test.Input
+typealias Input = CollectionParserTest.Input
 
 struct ByteParser: Parsing, Sendable {}
 
