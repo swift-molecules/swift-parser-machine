@@ -48,7 +48,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/swift-atoms/swift-parser.git",
-            branch: "main", traits: ["CollectionLeaves"]),
+            branch: "main", traits: ["CollectionLeaves", "Collection", "Either"]),
         .package(
             url: "https://github.com/swift-molecules/swift-stack.git",
             branch: "main"
