@@ -11,5 +11,5 @@ extension Parser.Machine {
         Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
     > =
-        Machine.Machine.Program<Leaf<Input, Failure>, Failure, Mode>
+        Machine::Machine.Program<Leaf<Input, Failure>, Failure, Mode>
 }

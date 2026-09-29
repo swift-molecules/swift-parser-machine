@@ -16,10 +16,10 @@ extension Parser.Machine {
         Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
     {
-        typealias Value = Parser.Parser.Machine.Value
-        typealias Frame = Parser.Parser.Machine.Frame<Input, Failure>
-        typealias Node = Parser.Parser.Machine.Node<Input, Failure>
-        typealias Recovery = Parser.Parser.Machine.Failure.Recovery
+        typealias Value = Parser::Parser.Machine.Value
+        typealias Frame = Parser::Parser.Machine.Frame<Input, Failure>
+        typealias Node = Parser::Parser.Machine.Node<Input, Failure>
+        typealias Recovery = Parser::Parser.Machine.Failure.Recovery
 
         var current = root
 
@@ -334,7 +334,7 @@ extension Parser.Machine {
 
             case .ref(let target):
                 if let limit = program.maxDepth, depth >= limit {
-                    let error = Parser.Parser.Machine.Runtime.Error.depthExceeded(
+                    let error = Parser::Parser.Machine.Runtime.Error.depthExceeded(
                         limit: limit
                     )
                     switch try handleFailure(

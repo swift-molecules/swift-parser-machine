@@ -29,7 +29,7 @@ extension Parser.Machine {
         }
 
         public func parse(_ input: inout Input) throws(Failure) -> Output {
-            try Parser.Parser.Machine.run(
+            try Parser::Parser.Machine.run(
                 program: program,
                 root: root,
                 input: &input,

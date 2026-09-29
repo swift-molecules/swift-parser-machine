@@ -10,10 +10,10 @@ extension Parser.Machine {
         Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
     >: ~Copyable {
-        package var inner: Machine.Machine.Builder<Leaf<Input, Failure>, Failure, Mode>
+        package var inner: Machine::Machine.Builder<Leaf<Input, Failure>, Failure, Mode>
 
         package init(maxDepth: Int? = nil) {
-            self.inner = Machine.Machine.Builder(maxDepth: maxDepth)
+            self.inner = Machine::Machine.Builder(maxDepth: maxDepth)
         }
 
         @usableFromInline
@@ -21,7 +21,7 @@ extension Parser.Machine {
             inner.allocate(node)
         }
 
-        package var captures: Machine.Machine.Capture.Store<Mode> {
+        package var captures: Machine::Machine.Capture.Store<Mode> {
             get { inner.captures }
             _modify { yield &inner.captures }
         }

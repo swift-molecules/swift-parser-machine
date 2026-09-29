@@ -11,7 +11,7 @@ extension Parser.Machine {
         Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
     > =
-        Machine.Machine.Node<Leaf<Input, Failure>, Failure, Mode>
+        Machine::Machine.Node<Leaf<Input, Failure>, Failure, Mode>
 
     public struct Leaf<Input: Cursor.`Protocol` & ~Copyable, Failure: Swift.Error> {
         @usableFromInline

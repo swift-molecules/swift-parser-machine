@@ -10,7 +10,7 @@ extension Parser.Machine {
     public typealias Frame<
         Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift.Error
-    > = Machine.Machine.Frame<
+    > = Machine::Machine.Frame<
         Node<Input, Failure>.ID,
         Input.Checkpoint,
         Mode,
