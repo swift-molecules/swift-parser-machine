@@ -1,58 +1,32 @@
+public import Machine
 public import Checkpoint
 public import Cursor
 public import Iterator
+public import Parser
 
-extension Parser.Parse
+extension Parser::Parsing
 where
-    P.Input: Cursor.`Protocol`,
-    P.Failure: Swift.Error
-{
-
-    public func compiled(
-        using witness: Parser.Machine.Compile.Witness<P>
-    ) -> Parser.Machine.Compiled<P> {
-        Parser.Machine.Compiled(source: parser, witness: witness)
-    }
-
-    public func prepared(
-        using witness: Parser.Machine.Compile.Witness<P>
-    ) -> Parser.Machine.Prepared<P> {
-        Parser.Machine.Prepared(source: parser, witness: witness)
-    }
-
-    public func compiled() -> Parser.Machine.Compiled<P> {
-        compiled(using: .leaf)
-    }
-
-    public func prepared() -> Parser.Machine.Prepared<P> {
-        prepared(using: .leaf)
-    }
-}
-
-extension Parser.Parse
-where
-    P: ~Copyable,
-    P.Input: Cursor.`Protocol`,
-    P.Failure: Swift.Error
+    Self: ~Copyable,
+    Input: Cursor.`Protocol`
 {
 
     public consuming func compiled(
-        using witness: Parser.Machine.Compile.Witness<P>
-    ) -> Parser.Machine.Compiled<P> {
-        Parser.Machine.Compiled(source: parser, witness: witness)
+        using witness: Machine.Parser.Compile.Witness<Self>
+    ) -> Machine.Parser.Compiled<Self> {
+        Machine.Parser.Compiled(source: self, witness: witness)
     }
 
     public consuming func prepared(
-        using witness: Parser.Machine.Compile.Witness<P>
-    ) -> Parser.Machine.Prepared<P> {
-        Parser.Machine.Prepared(source: parser, witness: witness)
+        using witness: Machine.Parser.Compile.Witness<Self>
+    ) -> Machine.Parser.Prepared<Self> {
+        Machine.Parser.Prepared(source: self, witness: witness)
     }
 
-    public consuming func compiled() -> Parser.Machine.Compiled<P> {
+    public consuming func compiled() -> Machine.Parser.Compiled<Self> {
         compiled(using: .leaf)
     }
 
-    public consuming func prepared() -> Parser.Machine.Prepared<P> {
+    public consuming func prepared() -> Machine.Parser.Prepared<Self> {
         prepared(using: .leaf)
     }
 }

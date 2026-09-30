@@ -1,12 +1,12 @@
 public import Machine
 @_exported import Parser
 
-extension Parser {
+extension Machine::Machine {
 
-    public enum Machine {}
+    public enum Parser {}
 }
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public typealias Mode = Machine::Machine.Capture.Mode.Unchecked
 

@@ -3,19 +3,19 @@ package import Parser_Machine_Program
 import Parser
 package import Tagged
 
-extension Parser.Machine {
+extension Machine.Parser {
     package enum Failure {}
 }
 
-extension Parser.Machine.Failure {
+extension Machine.Parser.Failure {
     package enum Recovery {
         case continueWith(ID)
-        case handleReady(Parser.Machine.Value.Handle)
+        case handleReady(Machine.Parser.Value.Handle)
         case propagate
     }
 }
 
-extension Parser.Machine.Failure.Recovery {
+extension Machine.Parser.Failure.Recovery {
     package enum Tag {}
 
     package typealias ID = Tagged<Tag, Ordinal>

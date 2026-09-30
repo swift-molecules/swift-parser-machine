@@ -1,22 +1,24 @@
+import Collection_Parser_Test_Support
+import Machine
 import Parser_Machine_Combinator
 import Parser_Machine_Parse
 import Parser_Test_Support
 import Testing
 
 @Suite
-struct `Parser.Machine.Parser.Parse Tests` {
+struct `Machine.Parser.Parser.Parse Tests` {
     @Suite struct Unit {}
     @Suite struct `Edge Case` {}
     @Suite struct Integration {}
     @Suite(.serialized) struct Performance {}
 }
 
-extension `Parser.Machine.Parser.Parse Tests`.Unit {
+extension `Machine.Parser.Parser.Parse Tests`.Unit {
     @Test
     func `parse accessor callAsFunction executes parser`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, ByteParser.Error> =
-            Parser.Machine.build { builder in
-                Parser.Machine.leaf(ByteParser(), in: &builder)
+        let parser: Machine.Parser.Parser<Input, UInt8, ByteParser.Error> =
+            Machine.Parser.build { builder in
+                Machine.Parser.leaf(ByteParser(), in: &builder)
             }
 
         var input = Input([65])

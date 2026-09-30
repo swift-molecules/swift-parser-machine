@@ -1,11 +1,11 @@
 public import Checkpoint
 public import Cursor
 public import Iterator
-internal import Machine
+public import Machine
 import Parser
 internal import Tagged
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public static func recursive<Input, Output, Failure>(
         maxDepth: Int? = nil,

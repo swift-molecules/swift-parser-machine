@@ -1,14 +1,15 @@
-extension Parser.Machine.Memoization {
+package import Machine
+extension Machine.Parser.Memoization {
 
     package enum Entry<Checkpoint> {
 
-        case success(output: Parser.Machine.Value, end: Checkpoint)
+        case success(output: Machine.Parser.Value, end: Checkpoint)
 
         case failure(any Swift.Error)
     }
 }
 
-extension Parser.Machine.Memoization.Entry {
+extension Machine.Parser.Memoization.Entry {
     package var isSuccess: Bool {
         switch self {
         case .success: return true

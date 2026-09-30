@@ -1,4 +1,5 @@
-extension Parser.Machine.Memoization {
+package import Machine
+extension Machine.Parser.Memoization {
 
     package struct Key<Checkpoint: Hashable>: Hashable {
 
@@ -13,4 +14,4 @@ extension Parser.Machine.Memoization {
     }
 }
 
-extension Parser.Machine.Memoization.Key: Sendable where Checkpoint: Sendable {}
+extension Machine.Parser.Memoization.Key: Sendable where Checkpoint: Sendable {}

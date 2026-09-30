@@ -1,11 +1,11 @@
 public import Checkpoint
 public import Cursor
 public import Iterator
-internal import Machine
+public import Machine
 import Parser
 internal import Tagged
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public static func pure<Input, Output, Failure>(
         _ value: Output,
@@ -21,33 +21,33 @@ extension Parser.Machine {
     }
 }
 
-extension Parser.Machine.Expression {
+extension Machine.Parser.Expression {
 
     public func map<T>(
         _ transform: @escaping (Output) -> T,
-        in builder: inout Parser.Machine.Builder<Input, Failure>
-    ) -> Parser.Machine.Expression<Input, Failure, T> {
+        in builder: inout Machine.Parser.Builder<Input, Failure>
+    ) -> Machine.Parser.Expression<Input, Failure, T> {
         let captureID = builder.captures.insert(transform)
-        let node = Parser.Machine.Node<Input, Failure>.map(
+        let node = Machine.Parser.Node<Input, Failure>.map(
             child: self.node,
-            transform: Parser.Machine.Transform.Erased(capture: captureID)
+            transform: Machine.Parser.Transform.Erased(capture: captureID)
         )
         let nodeID = builder.allocate(node)
-        return Parser.Machine.Expression(node: nodeID)
+        return Machine.Parser.Expression(node: nodeID)
     }
 }
 
-extension Parser.Machine.Expression {
+extension Machine.Parser.Expression {
 
     public func tryMap<T>(
         _ transform: @escaping (Output) throws(Failure) -> T,
-        in builder: inout Parser.Machine.Builder<Input, Failure>
-    ) -> Parser.Machine.Expression<Input, Failure, T> {
-        Parser.Machine.tryMap(self, transform, in: &builder)
+        in builder: inout Machine.Parser.Builder<Input, Failure>
+    ) -> Machine.Parser.Expression<Input, Failure, T> {
+        Machine.Parser.tryMap(self, transform, in: &builder)
     }
 }
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public static func tryMap<Input, Output, Failure, NewOutput>(
         _ expr: Expression<Input, Failure, Output>,
@@ -68,27 +68,27 @@ extension Parser.Machine {
     }
 }
 
-extension Parser.Machine.Expression {
+extension Machine.Parser.Expression {
 
     public func flatMap<T>(
-        _ next: @escaping (Output) -> Parser.Machine.Expression<Input, Failure, T>,
-        in builder: inout Parser.Machine.Builder<Input, Failure>
-    ) -> Parser.Machine.Expression<Input, Failure, T> {
-        typealias NodeID = Parser.Machine.Node<Input, Failure>.ID
+        _ next: @escaping (Output) -> Machine.Parser.Expression<Input, Failure, T>,
+        in builder: inout Machine.Parser.Builder<Input, Failure>
+    ) -> Machine.Parser.Expression<Input, Failure, T> {
+        typealias NodeID = Machine.Parser.Node<Input, Failure>.ID
         let nextFn: (Output) -> NodeID = { output in
             next(output).node
         }
         let captureID = builder.captures.insert(nextFn)
-        let node = Parser.Machine.Node<Input, Failure>.flatMap(
+        let node = Machine.Parser.Node<Input, Failure>.flatMap(
             child: self.node,
-            next: Parser.Machine.Next.Erased(capture: captureID)
+            next: Machine.Parser.Next.Erased(capture: captureID)
         )
         let nodeID = builder.allocate(node)
-        return Parser.Machine.Expression(node: nodeID)
+        return Machine.Parser.Expression(node: nodeID)
     }
 }
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public static func sequence<Input, Failure, A, B, C>(
         _ a: Expression<Input, Failure, A>,
@@ -111,7 +111,7 @@ extension Parser.Machine {
     }
 }
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public static func oneOf<Input, Failure, Output>(
         _ alternatives: [Expression<Input, Failure, Output>],
@@ -128,7 +128,7 @@ extension Parser.Machine {
     }
 }
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public static func many<Input, Failure, T>(
         _ expr: Expression<Input, Failure, T>,
@@ -147,7 +147,7 @@ extension Parser.Machine {
     }
 }
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public static func optional<Input, Failure, T>(
         _ expr: Expression<Input, Failure, T>,
@@ -169,13 +169,13 @@ extension Parser.Machine {
     }
 }
 
-extension Parser.Machine.Reference {
+extension Machine.Parser.Reference {
 
     public func expression(
-        in builder: inout Parser.Machine.Builder<Input, Failure>
-    ) -> Parser.Machine.Expression<Input, Failure, Output> {
-        let node = Parser.Machine.Node<Input, Failure>.ref(self.node)
+        in builder: inout Machine.Parser.Builder<Input, Failure>
+    ) -> Machine.Parser.Expression<Input, Failure, Output> {
+        let node = Machine.Parser.Node<Input, Failure>.ref(self.node)
         let nodeID = builder.allocate(node)
-        return Parser.Machine.Expression(node: nodeID)
+        return Machine.Parser.Expression(node: nodeID)
     }
 }

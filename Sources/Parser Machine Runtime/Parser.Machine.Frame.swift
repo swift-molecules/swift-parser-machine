@@ -5,7 +5,7 @@ public import Machine
 public import Parser_Machine_Program
 import Parser
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public typealias Frame<
         Input: Cursor.`Protocol` & ~Copyable,

@@ -1,20 +1,22 @@
+import Collection_Parser_Test_Support
+import Machine
 import Parser_Machine_Combinator
 import Parser_Machine_Compile
 import Parser_Test_Support
 import Testing
 
 @Suite
-struct `Parser.Machine.Compiled Tests` {
+struct `Machine.Parser.Compiled Tests` {
     @Suite struct Unit {}
     @Suite struct `Edge Case` {}
     @Suite struct Integration {}
     @Suite(.serialized) struct Performance {}
 }
 
-extension `Parser.Machine.Compiled Tests`.Unit {
+extension `Machine.Parser.Compiled Tests`.Unit {
     @Test
     func `compiled parser lazily compiles on first parse`() throws {
-        let compiled = Parser.Machine.Compiled(source: ByteParser(), witness: .leaf)
+        let compiled = Machine.Parser.Compiled(source: ByteParser(), witness: .leaf)
 
         var input = Input([65])
         let result = try compiled.parse(&input)
@@ -23,7 +25,7 @@ extension `Parser.Machine.Compiled Tests`.Unit {
 
     @Test
     func `compiled parser reuses cached program on subsequent parses`() throws {
-        let compiled = Parser.Machine.Compiled(source: ByteParser(), witness: .leaf)
+        let compiled = Machine.Parser.Compiled(source: ByteParser(), witness: .leaf)
 
         var input1 = Input([65])
         let result1 = try compiled.parse(&input1)
@@ -37,7 +39,7 @@ extension `Parser.Machine.Compiled Tests`.Unit {
 
     @Test
     func `prepared from compiled returns immutable parser`() throws {
-        let compiled = Parser.Machine.Compiled(source: ByteParser(), witness: .leaf)
+        let compiled = Machine.Parser.Compiled(source: ByteParser(), witness: .leaf)
         let prepared = compiled.prepared()
 
         var input = Input([42])

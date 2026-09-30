@@ -1,3 +1,4 @@
+import Collection_Parser_Test_Support
 import Machine
 import Parser_Machine_Memoization
 import Tagged_Test_Support
@@ -8,33 +9,33 @@ private enum TestFailure: Swift.Error, Sendable {
 }
 
 @Suite
-struct `Parser.Machine.Memoization.Table Tests` {
+struct `Machine.Parser.Memoization.Table Tests` {
     @Suite struct Unit {}
     @Suite struct `Edge Case` {}
     @Suite struct Integration {}
     @Suite(.serialized) struct Performance {}
 }
 
-extension `Parser.Machine.Memoization.Table Tests`.Unit {
+extension `Machine.Parser.Memoization.Table Tests`.Unit {
     @Test
     func `new table is empty`() {
-        let table = Parser.Machine.Memoization.Table<Int>()
+        let table = Machine.Parser.Memoization.Table<Int>()
         #expect(table.isEmpty)
         #expect(table.count == 0)
     }
 
     @Test
     func `new table with capacity is empty`() {
-        let table = Parser.Machine.Memoization.Table<Int>(capacity: 100)
+        let table = Machine.Parser.Memoization.Table<Int>(capacity: 100)
         #expect(table.isEmpty)
         #expect(table.count == 0)
     }
 
     @Test
     func `store and lookup returns entry`() {
-        var table = Parser.Machine.Memoization.Table<Int>()
-        let key = Parser.Machine.Memoization.Key<Int>(position: 0, node: 1)
-        let entry = Parser.Machine.Memoization.Entry<Int>.failure(TestFailure.sample)
+        var table = Machine.Parser.Memoization.Table<Int>()
+        let key = Machine.Parser.Memoization.Key<Int>(position: 0, node: 1)
+        let entry = Machine.Parser.Memoization.Entry<Int>.failure(TestFailure.sample)
 
         table.store(entry, for: key)
         let result = table.lookup(key)
@@ -43,9 +44,9 @@ extension `Parser.Machine.Memoization.Table Tests`.Unit {
 
     @Test
     func `count reflects stored entries`() {
-        var table = Parser.Machine.Memoization.Table<Int>()
-        let key1 = Parser.Machine.Memoization.Key<Int>(position: 0, node: 1)
-        let key2 = Parser.Machine.Memoization.Key<Int>(position: 1, node: 1)
+        var table = Machine.Parser.Memoization.Table<Int>()
+        let key1 = Machine.Parser.Memoization.Key<Int>(position: 0, node: 1)
+        let key2 = Machine.Parser.Memoization.Key<Int>(position: 1, node: 1)
 
         table.store(.failure(TestFailure.sample), for: key1)
         table.store(.failure(TestFailure.sample), for: key2)
@@ -54,8 +55,8 @@ extension `Parser.Machine.Memoization.Table Tests`.Unit {
 
     @Test
     func `clear removes all entries`() {
-        var table = Parser.Machine.Memoization.Table<Int>()
-        let key = Parser.Machine.Memoization.Key<Int>(position: 0, node: 1)
+        var table = Machine.Parser.Memoization.Table<Int>()
+        let key = Machine.Parser.Memoization.Key<Int>(position: 0, node: 1)
         table.store(.failure(TestFailure.sample), for: key)
         #expect(!table.isEmpty)
 
@@ -65,23 +66,23 @@ extension `Parser.Machine.Memoization.Table Tests`.Unit {
     }
 }
 
-extension `Parser.Machine.Memoization.Table Tests`.`Edge Case` {
+extension `Machine.Parser.Memoization.Table Tests`.`Edge Case` {
     @Test
     func `lookup for missing key returns nil`() {
-        let table = Parser.Machine.Memoization.Table<Int>()
-        let key = Parser.Machine.Memoization.Key<Int>(position: 0, node: 1)
+        let table = Machine.Parser.Memoization.Table<Int>()
+        let key = Machine.Parser.Memoization.Key<Int>(position: 0, node: 1)
         #expect(table.lookup(key) == nil)
     }
 
     @Test
     func `store overwrites existing entry for same key`() {
-        var table = Parser.Machine.Memoization.Table<Int>()
-        let key = Parser.Machine.Memoization.Key<Int>(position: 0, node: 1)
+        var table = Machine.Parser.Memoization.Table<Int>()
+        let key = Machine.Parser.Memoization.Key<Int>(position: 0, node: 1)
 
         table.store(.failure(TestFailure.sample), for: key)
         #expect(table.lookup(key)?.isFailure == true)
 
-        let value = Parser.Machine.Value.make(42)
+        let value = Machine.Parser.Value.make(42)
         table.store(.success(output: value, end: 1), for: key)
         #expect(table.lookup(key)?.isSuccess == true)
         #expect(table.count == 1)
@@ -89,10 +90,10 @@ extension `Parser.Machine.Memoization.Table Tests`.`Edge Case` {
 
     @Test
     func `invalidate from position removes entries at or after`() {
-        var table = Parser.Machine.Memoization.Table<Int>()
-        let key0 = Parser.Machine.Memoization.Key<Int>(position: 0, node: 1)
-        let key5 = Parser.Machine.Memoization.Key<Int>(position: 5, node: 1)
-        let key10 = Parser.Machine.Memoization.Key<Int>(position: 10, node: 1)
+        var table = Machine.Parser.Memoization.Table<Int>()
+        let key0 = Machine.Parser.Memoization.Key<Int>(position: 0, node: 1)
+        let key5 = Machine.Parser.Memoization.Key<Int>(position: 5, node: 1)
+        let key10 = Machine.Parser.Memoization.Key<Int>(position: 10, node: 1)
 
         table.store(.failure(TestFailure.sample), for: key0)
         table.store(.failure(TestFailure.sample), for: key5)
@@ -108,17 +109,17 @@ extension `Parser.Machine.Memoization.Table Tests`.`Edge Case` {
 
     @Test
     func `invalidate with edit removes overlapping entries`() {
-        var table = Parser.Machine.Memoization.Table<Int>()
-        let key0 = Parser.Machine.Memoization.Key<Int>(position: 0, node: 1)
-        let key5 = Parser.Machine.Memoization.Key<Int>(position: 5, node: 1)
-        let key15 = Parser.Machine.Memoization.Key<Int>(position: 15, node: 1)
+        var table = Machine.Parser.Memoization.Table<Int>()
+        let key0 = Machine.Parser.Memoization.Key<Int>(position: 0, node: 1)
+        let key5 = Machine.Parser.Memoization.Key<Int>(position: 5, node: 1)
+        let key15 = Machine.Parser.Memoization.Key<Int>(position: 15, node: 1)
 
         table.store(.failure(TestFailure.sample), for: key0)
         table.store(.failure(TestFailure.sample), for: key5)
         table.store(.failure(TestFailure.sample), for: key15)
         #expect(table.count == 3)
 
-        let edit = Parser.Machine.Memoization.Edit<Int>(start: 5, oldEnd: 10, newEnd: 8)
+        let edit = Machine.Parser.Memoization.Edit<Int>(start: 5, oldEnd: 10, newEnd: 8)
         table.invalidate(edit)
 
         #expect(table.lookup(key0) != nil)

@@ -5,7 +5,7 @@ public import Machine
 import Parser
 public import Tagged
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     @inlinable
     public static func leaf<Input, Output, Failure, P>(
@@ -13,7 +13,7 @@ extension Parser.Machine {
         in builder: inout Builder<Input, Failure>
     ) -> Expression<Input, Failure, Output>
     where
-        P: Parser.Parsing & ~Copyable,
+        P: Parser::Parsing & ~Copyable,
         P.Input == Input,
         P.Output == Output,
         P.Failure == Failure,
@@ -36,7 +36,7 @@ extension Parser.Machine {
         in builder: inout Builder<Input, Failure>
     ) -> Expression<Input, Failure, Output>
     where
-        P: Parser.Parsing & ~Copyable,
+        P: Parser::Parsing & ~Copyable,
         P.Input == Input,
         P.Output == Output,
         Input: Cursor.`Protocol` & ~Copyable,

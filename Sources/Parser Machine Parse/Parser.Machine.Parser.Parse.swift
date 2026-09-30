@@ -1,11 +1,11 @@
-internal import Machine
+public import Machine
 
-extension Parser.Machine.Parser {
+extension Machine.Parser.Parser {
 
     public struct Parse {
-        package let parser: Parser.Machine.Parser<Input, Output, Failure>
+        package let parser: Machine.Parser.Parser<Input, Output, Failure>
 
-        package init(parser: Parser.Machine.Parser<Input, Output, Failure>) {
+        package init(parser: Machine.Parser.Parser<Input, Output, Failure>) {
             self.parser = parser
         }
     }
@@ -15,10 +15,10 @@ extension Parser.Machine.Parser {
     }
 }
 
-extension Parser.Machine.Parser.Parse {
+extension Machine.Parser.Parser.Parse {
 
     public func callAsFunction(_ input: inout Input) throws(Failure) -> Output {
-        try Parser.Machine.run(
+        try Machine.Parser.run(
             program: parser.program,
             root: parser.root,
             input: &input,

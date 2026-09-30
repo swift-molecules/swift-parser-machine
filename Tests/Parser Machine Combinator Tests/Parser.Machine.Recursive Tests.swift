@@ -1,3 +1,5 @@
+import Collection_Parser_Test_Support
+import Machine
 import Parser_Machine_Combinator
 import Parser_Machine_Parse
 import Parser_Test_Support
@@ -11,7 +13,7 @@ extension OpenParen {
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: "(") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
     }
 }
 
@@ -23,7 +25,7 @@ extension CloseParen {
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: ")") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
     }
 }
 
@@ -34,35 +36,35 @@ private enum ParenError: Swift.Error, Sendable {
 
 private func balancedParenParser(
     maxDepth: Int
-) -> Parser.Machine.Parser<Input, Int, ParenError> {
-    Parser.Machine.recursive(maxDepth: maxDepth) { builder, selfRef in
-        let empty = Parser.Machine.pure(0, in: &builder)
-        let open = Parser.Machine.leaf(
+) -> Machine.Parser.Parser<Input, Int, ParenError> {
+    Machine.Parser.recursive(maxDepth: maxDepth) { builder, selfRef in
+        let empty = Machine.Parser.pure(0, in: &builder)
+        let open = Machine.Parser.leaf(
             OpenParen(),
             mapError: { _ in ParenError.openParen },
             in: &builder
         )
-        let close = Parser.Machine.leaf(
+        let close = Machine.Parser.leaf(
             CloseParen(),
             mapError: { _ in ParenError.closeParen },
             in: &builder
         )
         let inner = selfRef.expression(in: &builder)
 
-        let recursive = Parser.Machine.sequence(
+        let recursive = Machine.Parser.sequence(
             open,
             inner,
             combine: { (_: Void, depth: Int) in depth },
             in: &builder
         )
-        let withClose = Parser.Machine.sequence(
+        let withClose = Machine.Parser.sequence(
             recursive,
             close,
             combine: { (depth: Int, _: Void) in depth + 1 },
             in: &builder
         )
 
-        return Parser.Machine.oneOf([withClose, empty], in: &builder)
+        return Machine.Parser.oneOf([withClose, empty], in: &builder)
     }
 }
 
@@ -82,7 +84,7 @@ extension OpenBracket {
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: "<") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
     }
 }
 
@@ -93,7 +95,7 @@ extension CloseBracket {
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: ">") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
     }
 }
 
@@ -104,10 +106,10 @@ extension SlashClose {
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: "/") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
         guard input.first == UInt8(ascii: ">") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
     }
 }
 
@@ -122,15 +124,15 @@ extension ParseOpen {
     func parse(_ input: inout Input) throws(Error) -> StartTagOutput {
         guard input.first == UInt8(ascii: "<") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
         guard input.first == UInt8(ascii: "/") else {
             return StartTagOutput(isEmpty: false)
         }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
         guard input.first == UInt8(ascii: ">") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
         return StartTagOutput(isEmpty: true)
     }
 }
@@ -142,11 +144,11 @@ extension ParseClose {
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: ">") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
     }
 }
 
-extension Parser.Machine.Test {
+extension Machine.Parser.Test {
     @Suite struct Recursive {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
@@ -155,7 +157,7 @@ extension Parser.Machine.Test {
     }
 }
 
-extension Parser.Machine.Test.Recursive.Unit {
+extension Machine.Parser.Test.Recursive.Unit {
     @Test
     func `balanced parentheses parses three levels`() throws {
         let parser = balancedParenParser(maxDepth: 1000)
@@ -182,9 +184,9 @@ extension Parser.Machine.Test.Recursive.Unit {
 
     @Test
     func `build creates non-recursive parser`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, ByteParser.Error> =
-            Parser.Machine.build { builder in
-                Parser.Machine.leaf(ByteParser(), in: &builder)
+        let parser: Machine.Parser.Parser<Input, UInt8, ByteParser.Error> =
+            Machine.Parser.build { builder in
+                Machine.Parser.leaf(ByteParser(), in: &builder)
             }
 
         var input = Input([42])
@@ -193,7 +195,7 @@ extension Parser.Machine.Test.Recursive.Unit {
     }
 }
 
-extension Parser.Machine.Test.Recursive.Integration {
+extension Machine.Parser.Test.Recursive.Integration {
     @Test
     func `deep nesting 2000 levels without stack overflow`() throws {
         let parser = balancedParenParser(maxDepth: 10000)
@@ -224,19 +226,19 @@ extension Parser.Machine.Test.Recursive.Integration {
 
     @Test
     func `deep nesting with complex types 1000 levels`() throws {
-        let parser: Parser.Machine.Parser<Input, XMLElement, ParenError> =
-            Parser.Machine.recursive(maxDepth: 2000) { builder, selfRef in
-                let open = Parser.Machine.leaf(
+        let parser: Machine.Parser.Parser<Input, XMLElement, ParenError> =
+            Machine.Parser.recursive(maxDepth: 2000) { builder, selfRef in
+                let open = Machine.Parser.leaf(
                     OpenBracket(),
                     mapError: { _ in ParenError.openParen },
                     in: &builder
                 )
-                let close = Parser.Machine.leaf(
+                let close = Machine.Parser.leaf(
                     CloseBracket(),
                     mapError: { _ in ParenError.closeParen },
                     in: &builder
                 )
-                let slashClose = Parser.Machine.leaf(
+                let slashClose = Machine.Parser.leaf(
                     SlashClose(),
                     mapError: { _ in ParenError.closeParen },
                     in: &builder
@@ -245,15 +247,15 @@ extension Parser.Machine.Test.Recursive.Integration {
                 let elementContent = selfRef.expression(in: &builder)
                     .map({ XMLContent.element($0) }, in: &builder)
 
-                let content = Parser.Machine.many(elementContent, in: &builder)
+                let content = Machine.Parser.many(elementContent, in: &builder)
 
-                let openWithContent = Parser.Machine.sequence(
+                let openWithContent = Machine.Parser.sequence(
                     open,
                     content,
                     combine: { (_: Void, c: [XMLContent]) in c },
                     in: &builder
                 )
-                let nonEmpty = Parser.Machine.sequence(
+                let nonEmpty = Machine.Parser.sequence(
                     openWithContent,
                     close,
                     combine: { (contents: [XMLContent], _: Void) in
@@ -262,7 +264,7 @@ extension Parser.Machine.Test.Recursive.Integration {
                     in: &builder
                 )
 
-                let emptyElement = Parser.Machine.sequence(
+                let emptyElement = Machine.Parser.sequence(
                     open,
                     slashClose,
                     combine: { (_: Void, _: Void) in
@@ -271,7 +273,7 @@ extension Parser.Machine.Test.Recursive.Integration {
                     in: &builder
                 )
 
-                return Parser.Machine.oneOf([nonEmpty, emptyElement], in: &builder)
+                return Machine.Parser.oneOf([nonEmpty, emptyElement], in: &builder)
             }
 
         var bytes: [UInt8] = []
@@ -288,14 +290,14 @@ extension Parser.Machine.Test.Recursive.Integration {
 
     @Test
     func `deep nesting with tryMap disambiguation 50 levels`() throws {
-        let parser: Parser.Machine.Parser<Input, XMLElement, ParenError> =
-            Parser.Machine.recursive(maxDepth: 100) { builder, selfRef in
-                let startTag = Parser.Machine.leaf(
+        let parser: Machine.Parser.Parser<Input, XMLElement, ParenError> =
+            Machine.Parser.recursive(maxDepth: 100) { builder, selfRef in
+                let startTag = Machine.Parser.leaf(
                     ParseOpen(),
                     mapError: { _ in ParenError.openParen },
                     in: &builder
                 )
-                let endTag = Parser.Machine.leaf(
+                let endTag = Machine.Parser.leaf(
                     ParseClose(),
                     mapError: { _ in ParenError.closeParen },
                     in: &builder
@@ -320,15 +322,15 @@ extension Parser.Machine.Test.Recursive.Integration {
                 let elementContent = selfRef.expression(in: &builder)
                     .map({ XMLContent.element($0) }, in: &builder)
 
-                let content = Parser.Machine.many(elementContent, in: &builder)
+                let content = Machine.Parser.many(elementContent, in: &builder)
 
-                let withContent = Parser.Machine.sequence(
+                let withContent = Machine.Parser.sequence(
                     openTag,
                     content,
                     combine: { (_: StartTagOutput, c: [XMLContent]) in c },
                     in: &builder
                 )
-                let nonEmptyElement = Parser.Machine.sequence(
+                let nonEmptyElement = Machine.Parser.sequence(
                     withContent,
                     endTag,
                     combine: { (contents: [XMLContent], _: Void) in
@@ -337,7 +339,7 @@ extension Parser.Machine.Test.Recursive.Integration {
                     in: &builder
                 )
 
-                return Parser.Machine.oneOf([emptyElement, nonEmptyElement], in: &builder)
+                return Machine.Parser.oneOf([emptyElement, nonEmptyElement], in: &builder)
             }
 
         var bytes: [UInt8] = []
@@ -360,18 +362,18 @@ private enum DepthError: Swift.Error, Equatable, Sendable {
 
 private func unrecoverableRecursionParser(
     maxDepth: Int
-) -> Parser.Machine.Parser<Input, Int, DepthError> {
-    Parser.Machine.recursive(
+) -> Machine.Parser.Parser<Input, Int, DepthError> {
+    Machine.Parser.recursive(
         maxDepth: maxDepth,
         onDepthExceeded: { DepthError.tooDeep(limit: $0) },
         { builder, selfRef in
-            let open = Parser.Machine.leaf(
+            let open = Machine.Parser.leaf(
                 OpenParen(),
                 mapError: { _ in DepthError.openParen },
                 in: &builder
             )
             let inner = selfRef.expression(in: &builder)
-            return Parser.Machine.sequence(
+            return Machine.Parser.sequence(
                 open,
                 inner,
                 combine: { (_: Void, value: Int) in value },
@@ -381,7 +383,7 @@ private func unrecoverableRecursionParser(
     )
 }
 
-extension Parser.Machine.Test.Recursive.`Edge Case` {
+extension Machine.Parser.Test.Recursive.`Edge Case` {
     @Test
     func `exceeding the depth limit with no recovery throws the configured typed failure`() throws {
         let parser = unrecoverableRecursionParser(maxDepth: 4)

@@ -5,7 +5,7 @@ public import Machine
 import Parser
 internal import Tagged
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public typealias Program<
         Input: Cursor.`Protocol` & ~Copyable,

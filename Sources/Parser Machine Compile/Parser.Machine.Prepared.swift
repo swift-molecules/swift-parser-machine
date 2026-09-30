@@ -3,9 +3,9 @@ public import Cursor
 public import Iterator
 public import Machine
 
-extension Parser.Machine {
+extension Machine.Parser {
 
-    public struct Prepared<P: Parser.Parsing & ~Copyable>
+    public struct Prepared<P: Parser::Parsing & ~Copyable>
     where
         P.Input: Cursor.`Protocol`,
         P.Failure: Swift.Error
@@ -34,7 +34,7 @@ extension Parser.Machine {
     }
 }
 
-extension Parser.Machine.Prepared: Parser.Parsing where P: ~Copyable {
+extension Machine.Parser.Prepared: Parser::Parsing where P: ~Copyable {
 
     public typealias Input = P.Input
 
@@ -43,6 +43,6 @@ extension Parser.Machine.Prepared: Parser.Parsing where P: ~Copyable {
     public typealias Failure = P.Failure
 
     public func parse(_ input: inout Input) throws(Failure) -> Output {
-        try Parser.Machine.run(program: program, root: root, input: &input, as: Output.self)
+        try Machine.Parser.run(program: program, root: root, input: &input, as: Output.self)
     }
 }

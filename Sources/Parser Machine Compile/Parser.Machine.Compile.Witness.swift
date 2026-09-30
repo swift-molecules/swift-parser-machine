@@ -1,15 +1,16 @@
+public import Machine
 public import Checkpoint
 public import Cursor
 public import Iterator
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public enum Compile {}
 }
 
-extension Parser.Machine.Compile {
+extension Machine.Parser.Compile {
 
-    public struct Witness<P: Parser.Parsing & ~Copyable>
+    public struct Witness<P: Parser::Parsing & ~Copyable>
     where
         P.Input: Cursor.`Protocol`,
         P.Failure: Swift.Error
@@ -18,16 +19,16 @@ extension Parser.Machine.Compile {
         let _compile:
             (
                 consuming P,
-                inout Parser.Machine.Builder<P.Input, P.Failure>
-            ) -> Parser.Machine.Expression<P.Input, P.Failure, P.Output>
+                inout Machine.Parser.Builder<P.Input, P.Failure>
+            ) -> Machine.Parser.Expression<P.Input, P.Failure, P.Output>
 
         @inlinable
         public init(
             compile:
                 @escaping (
                     consuming P,
-                    inout Parser.Machine.Builder<P.Input, P.Failure>
-                ) -> Parser.Machine.Expression<P.Input, P.Failure, P.Output>
+                    inout Machine.Parser.Builder<P.Input, P.Failure>
+                ) -> Machine.Parser.Expression<P.Input, P.Failure, P.Output>
         ) {
             self._compile = compile
         }
@@ -35,19 +36,19 @@ extension Parser.Machine.Compile {
         @inlinable
         public func compile(
             _ parser: consuming P,
-            into builder: inout Parser.Machine.Builder<P.Input, P.Failure>
-        ) -> Parser.Machine.Expression<P.Input, P.Failure, P.Output> {
+            into builder: inout Machine.Parser.Builder<P.Input, P.Failure>
+        ) -> Machine.Parser.Expression<P.Input, P.Failure, P.Output> {
             _compile(parser, &builder)
         }
     }
 }
 
-extension Parser.Machine.Compile.Witness where P: ~Copyable {
+extension Machine.Parser.Compile.Witness where P: ~Copyable {
 
     @inlinable
     public static var leaf: Self {
         Self { parser, builder in
-            Parser.Machine.leaf(parser, in: &builder)
+            Machine.Parser.leaf(parser, in: &builder)
         }
     }
 }

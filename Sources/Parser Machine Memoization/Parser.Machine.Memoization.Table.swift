@@ -1,4 +1,5 @@
-extension Parser.Machine.Memoization {
+package import Machine
+extension Machine.Parser.Memoization {
 
     package struct Table<Checkpoint: Hashable> {
         @usableFromInline
@@ -14,22 +15,22 @@ extension Parser.Machine.Memoization {
     }
 }
 
-extension Parser.Machine.Memoization.Table {
+extension Machine.Parser.Memoization.Table {
     package func lookup(
-        _ key: Parser.Machine.Memoization.Key<Checkpoint>
-    ) -> Parser.Machine.Memoization.Entry<Checkpoint>? {
+        _ key: Machine.Parser.Memoization.Key<Checkpoint>
+    ) -> Machine.Parser.Memoization.Entry<Checkpoint>? {
         storage[key]
     }
 
     package mutating func store(
-        _ entry: Parser.Machine.Memoization.Entry<Checkpoint>,
-        for key: Parser.Machine.Memoization.Key<Checkpoint>
+        _ entry: Machine.Parser.Memoization.Entry<Checkpoint>,
+        for key: Machine.Parser.Memoization.Key<Checkpoint>
     ) {
         storage[key] = entry
     }
 }
 
-extension Parser.Machine.Memoization.Table {
+extension Machine.Parser.Memoization.Table {
     package var count: Int {
         storage.count
     }
@@ -43,9 +44,9 @@ extension Parser.Machine.Memoization.Table {
     }
 }
 
-extension Parser.Machine.Memoization.Table where Checkpoint: Comparable {
+extension Machine.Parser.Memoization.Table where Checkpoint: Comparable {
 
-    package mutating func invalidate(_ edit: Parser.Machine.Memoization.Edit<Checkpoint>) {
+    package mutating func invalidate(_ edit: Machine.Parser.Memoization.Edit<Checkpoint>) {
         storage = storage.filter { key, entry in
             switch entry {
             case .success(_, let endPosition):

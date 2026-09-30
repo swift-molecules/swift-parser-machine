@@ -1,3 +1,4 @@
+import Collection_Parser_Test_Support
 import Machine
 import Parser_Machine_Combinator
 import Parser_Machine_Memoization
@@ -12,7 +13,7 @@ extension OpenParen {
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: "(") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
     }
 }
 
@@ -23,7 +24,7 @@ extension CloseParen {
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: ")") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
     }
 }
 
@@ -33,19 +34,19 @@ private enum TestError: Swift.Error, Sendable {
 }
 
 @Suite
-struct `Parser.Machine.Parser.Parse.Incremental Tests` {
+struct `Machine.Parser.Parser.Parse.Incremental Tests` {
     @Suite struct Unit {}
     @Suite struct `Edge Case` {}
     @Suite struct Integration {}
     @Suite(.serialized) struct Performance {}
 }
 
-extension `Parser.Machine.Parser.Parse.Incremental Tests`.Unit {
+extension `Machine.Parser.Parser.Parse.Incremental Tests`.Unit {
     @Test
     func `incremental context parses correctly`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
-            Parser.Machine.build { builder in
-                Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let parser: Machine.Parser.Parser<Input, UInt8, MatchByte.Error> =
+            Machine.Parser.build { builder in
+                Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -56,9 +57,9 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.Unit {
 
     @Test
     func `memoization table populates during parsing`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
-            Parser.Machine.build { builder in
-                Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let parser: Machine.Parser.Parser<Input, UInt8, MatchByte.Error> =
+            Machine.Parser.build { builder in
+                Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -71,9 +72,9 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.Unit {
 
     @Test
     func `clear removes all cached entries`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
-            Parser.Machine.build { builder in
-                Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let parser: Machine.Parser.Parser<Input, UInt8, MatchByte.Error> =
+            Machine.Parser.build { builder in
+                Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -87,9 +88,9 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.Unit {
 
     @Test
     func `re-parsing produces same result`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
-            Parser.Machine.build { builder in
-                Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let parser: Machine.Parser.Parser<Input, UInt8, MatchByte.Error> =
+            Machine.Parser.build { builder in
+                Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -104,14 +105,14 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.Unit {
     }
 }
 
-extension `Parser.Machine.Parser.Parse.Incremental Tests`.`Edge Case` {
+extension `Machine.Parser.Parser.Parse.Incremental Tests`.`Edge Case` {
     @Test
     func `invalidate from position clears entries at or after`() throws {
-        let parser: Parser.Machine.Parser<Input, (UInt8, UInt8), MatchByte.Error> =
-            Parser.Machine.build { builder in
-                let first = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
-                let second = Parser.Machine.leaf(MatchByte(expected: 66), in: &builder)
-                return Parser.Machine.sequence(first, second, combine: { ($0, $1) }, in: &builder)
+        let parser: Machine.Parser.Parser<Input, (UInt8, UInt8), MatchByte.Error> =
+            Machine.Parser.build { builder in
+                let first = Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
+                let second = Machine.Parser.leaf(MatchByte(expected: 66), in: &builder)
+                return Machine.Parser.sequence(first, second, combine: { ($0, $1) }, in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -127,13 +128,13 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.`Edge Case` {
 
     @Test
     func `invalidate with edit descriptor removes affected entries`() throws {
-        let parser: Parser.Machine.Parser<Input, (UInt8, UInt8, UInt8), MatchByte.Error> =
-            Parser.Machine.build { builder in
-                let a = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
-                let b = Parser.Machine.leaf(MatchByte(expected: 66), in: &builder)
-                let c = Parser.Machine.leaf(MatchByte(expected: 67), in: &builder)
-                let ab = Parser.Machine.sequence(a, b, combine: { ($0, $1) }, in: &builder)
-                return Parser.Machine.sequence(ab, c, combine: { ($0.0, $0.1, $1) }, in: &builder)
+        let parser: Machine.Parser.Parser<Input, (UInt8, UInt8, UInt8), MatchByte.Error> =
+            Machine.Parser.build { builder in
+                let a = Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
+                let b = Machine.Parser.leaf(MatchByte(expected: 66), in: &builder)
+                let c = Machine.Parser.leaf(MatchByte(expected: 67), in: &builder)
+                let ab = Machine.Parser.sequence(a, b, combine: { ($0, $1) }, in: &builder)
+                return Machine.Parser.sequence(ab, c, combine: { ($0.0, $0.1, $1) }, in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -148,9 +149,9 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.`Edge Case` {
 
     @Test
     func `re-parsing previously-failed input throws the same typed failure`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
-            Parser.Machine.build { builder in
-                Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let parser: Machine.Parser.Parser<Input, UInt8, MatchByte.Error> =
+            Machine.Parser.build { builder in
+                Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -168,10 +169,10 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.`Edge Case` {
 
     @Test
     func `invalidate from position drops success entries whose span crosses the cutoff`() throws {
-        let parser: Parser.Machine.Parser<Input, [UInt8], ByteParser.Error> =
-            Parser.Machine.build { builder in
-                let byte = Parser.Machine.leaf(ByteParser(), in: &builder)
-                return Parser.Machine.many(byte, in: &builder)
+        let parser: Machine.Parser.Parser<Input, [UInt8], ByteParser.Error> =
+            Machine.Parser.build { builder in
+                let byte = Machine.Parser.leaf(ByteParser(), in: &builder)
+                return Machine.Parser.many(byte, in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -189,10 +190,10 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.`Edge Case` {
 
     @Test
     func `re-parse after insert edit matches a fresh parse of the edited content`() throws {
-        let parser: Parser.Machine.Parser<Input, [UInt8], ByteParser.Error> =
-            Parser.Machine.build { builder in
-                let byte = Parser.Machine.leaf(ByteParser(), in: &builder)
-                return Parser.Machine.many(byte, in: &builder)
+        let parser: Machine.Parser.Parser<Input, [UInt8], ByteParser.Error> =
+            Machine.Parser.build { builder in
+                let byte = Machine.Parser.leaf(ByteParser(), in: &builder)
+                return Machine.Parser.many(byte, in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -211,10 +212,10 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.`Edge Case` {
 
     @Test
     func `re-parse after delete edit matches a fresh parse of the edited content`() throws {
-        let parser: Parser.Machine.Parser<Input, [UInt8], ByteParser.Error> =
-            Parser.Machine.build { builder in
-                let byte = Parser.Machine.leaf(ByteParser(), in: &builder)
-                return Parser.Machine.many(byte, in: &builder)
+        let parser: Machine.Parser.Parser<Input, [UInt8], ByteParser.Error> =
+            Machine.Parser.build { builder in
+                let byte = Machine.Parser.leaf(ByteParser(), in: &builder)
+                return Machine.Parser.many(byte, in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -233,10 +234,10 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.`Edge Case` {
 
     @Test
     func `re-parse after replace edit matches a fresh parse of the edited content`() throws {
-        let parser: Parser.Machine.Parser<Input, [UInt8], ByteParser.Error> =
-            Parser.Machine.build { builder in
-                let byte = Parser.Machine.leaf(ByteParser(), in: &builder)
-                return Parser.Machine.many(byte, in: &builder)
+        let parser: Machine.Parser.Parser<Input, [UInt8], ByteParser.Error> =
+            Machine.Parser.build { builder in
+                let byte = Machine.Parser.leaf(ByteParser(), in: &builder)
+                return Machine.Parser.many(byte, in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -255,10 +256,10 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.`Edge Case` {
 
     @Test
     func `many under memoization terminates when child succeeds without consuming input`() throws {
-        let parser: Parser.Machine.Parser<Input, [Int], MatchByte.Error> =
-            Parser.Machine.build { builder in
-                let p = Parser.Machine.pure(7, in: &builder)
-                return Parser.Machine.many(p, in: &builder)
+        let parser: Machine.Parser.Parser<Input, [Int], MatchByte.Error> =
+            Machine.Parser.build { builder in
+                let p = Machine.Parser.pure(7, in: &builder)
+                return Machine.Parser.many(p, in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -268,15 +269,15 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.`Edge Case` {
     }
 }
 
-extension `Parser.Machine.Parser.Parse.Incremental Tests`.Integration {
+extension `Machine.Parser.Parser.Parse.Incremental Tests`.Integration {
     @Test
     func `oneOf with memoization caches failed alternatives`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
-            Parser.Machine.build { builder in
-                let a = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
-                let b = Parser.Machine.leaf(MatchByte(expected: 66), in: &builder)
-                let c = Parser.Machine.leaf(MatchByte(expected: 67), in: &builder)
-                return Parser.Machine.oneOf([a, b, c], in: &builder)
+        let parser: Machine.Parser.Parser<Input, UInt8, MatchByte.Error> =
+            Machine.Parser.build { builder in
+                let a = Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
+                let b = Machine.Parser.leaf(MatchByte(expected: 66), in: &builder)
+                let c = Machine.Parser.leaf(MatchByte(expected: 67), in: &builder)
+                return Machine.Parser.oneOf([a, b, c], in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -290,35 +291,35 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.Integration {
 
     @Test
     func `recursive grammar with memoization`() throws {
-        let parser: Parser.Machine.Parser<Input, Int, TestError> =
-            Parser.Machine.recursive(maxDepth: 100) { builder, selfRef in
-                let empty = Parser.Machine.pure(0, in: &builder)
-                let open = Parser.Machine.leaf(
+        let parser: Machine.Parser.Parser<Input, Int, TestError> =
+            Machine.Parser.recursive(maxDepth: 100) { builder, selfRef in
+                let empty = Machine.Parser.pure(0, in: &builder)
+                let open = Machine.Parser.leaf(
                     OpenParen(),
                     mapError: { _ in TestError.openParen },
                     in: &builder
                 )
-                let close = Parser.Machine.leaf(
+                let close = Machine.Parser.leaf(
                     CloseParen(),
                     mapError: { _ in TestError.closeParen },
                     in: &builder
                 )
                 let inner = selfRef.expression(in: &builder)
 
-                let recursive = Parser.Machine.sequence(
+                let recursive = Machine.Parser.sequence(
                     open,
                     inner,
                     combine: { (_: Void, depth: Int) in depth },
                     in: &builder
                 )
-                let withClose = Parser.Machine.sequence(
+                let withClose = Machine.Parser.sequence(
                     recursive,
                     close,
                     combine: { (depth: Int, _: Void) in depth + 1 },
                     in: &builder
                 )
 
-                return Parser.Machine.oneOf([withClose, empty], in: &builder)
+                return Machine.Parser.oneOf([withClose, empty], in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -332,9 +333,9 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.Integration {
 
     @Test
     func `fails then edit invalidates cached failure then re-parse succeeds`() throws {
-        let parser: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
-            Parser.Machine.build { builder in
-                Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let parser: Machine.Parser.Parser<Input, UInt8, MatchByte.Error> =
+            Machine.Parser.build { builder in
+                Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -353,16 +354,16 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.Integration {
     @Test
     func `depth-exceeded ref failure is never cached as a foreign-typed entry`() throws {
 
-        var refNodeID: Parser.Machine.Node<Input, TestError>.ID!
-        let parser: Parser.Machine.Parser<Input, Int, TestError> =
-            Parser.Machine.recursive(maxDepth: 1) { builder, selfRef in
-                let empty = Parser.Machine.pure(0, in: &builder)
-                let open = Parser.Machine.leaf(
+        var refNodeID: Machine.Parser.Node<Input, TestError>.ID!
+        let parser: Machine.Parser.Parser<Input, Int, TestError> =
+            Machine.Parser.recursive(maxDepth: 1) { builder, selfRef in
+                let empty = Machine.Parser.pure(0, in: &builder)
+                let open = Machine.Parser.leaf(
                     OpenParen(),
                     mapError: { _ in TestError.openParen },
                     in: &builder
                 )
-                let close = Parser.Machine.leaf(
+                let close = Machine.Parser.leaf(
                     CloseParen(),
                     mapError: { _ in TestError.closeParen },
                     in: &builder
@@ -370,20 +371,20 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.Integration {
                 let inner = selfRef.expression(in: &builder)
                 refNodeID = inner.node
 
-                let recursive = Parser.Machine.sequence(
+                let recursive = Machine.Parser.sequence(
                     open,
                     inner,
                     combine: { (_: Void, depth: Int) in depth },
                     in: &builder
                 )
-                let withClose = Parser.Machine.sequence(
+                let withClose = Machine.Parser.sequence(
                     recursive,
                     close,
                     combine: { (depth: Int, _: Void) in depth + 1 },
                     in: &builder
                 )
 
-                return Parser.Machine.oneOf([withClose, empty], in: &builder)
+                return Machine.Parser.oneOf([withClose, empty], in: &builder)
             }
 
         var ctx = parser.parse.incremental
@@ -393,7 +394,7 @@ extension `Parser.Machine.Parser.Parse.Incremental Tests`.Integration {
         #expect(result == 0)
 
         for position: Input.Checkpoint in [0, 1, 2, 3] {
-            let key = Parser.Machine.Memoization.Key<
+            let key = Machine.Parser.Memoization.Key<
                 Input.Checkpoint
             >(position: position, node: refNodeID.underlying)
             switch ctx.memoization.lookup(key) {

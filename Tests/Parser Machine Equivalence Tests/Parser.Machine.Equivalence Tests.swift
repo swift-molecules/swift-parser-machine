@@ -1,9 +1,11 @@
+import Collection_Parser_Test_Support
+import Machine
 import Parser_Machine_Combinator
 import Parser_Machine_Compile
 import Parser_Test_Support
 import Testing
 
-@Suite("Parser.Machine.Equivalence")
+@Suite("Machine.Parser.Equivalence")
 struct ParserMachineEquivalenceTests {
     @Suite("Direct ≡ Compiled") struct DirectEqualsCompiled {}
     @Suite struct `Stack Safety` {}
@@ -16,9 +18,9 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
 
         let direct = ByteParser()
 
-        let machine: Parser.Machine.Parser<Input, UInt8, ByteParser.Error> =
-            Parser.Machine.build { builder in
-                Parser.Machine.leaf(ByteParser(), in: &builder)
+        let machine: Machine.Parser.Parser<Input, UInt8, ByteParser.Error> =
+            Machine.Parser.build { builder in
+                Machine.Parser.leaf(ByteParser(), in: &builder)
             }
 
         var input1 = makeInput([65, 66])
@@ -36,9 +38,9 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
 
         let direct = ByteParser()
 
-        let machine: Parser.Machine.Parser<Input, Int, ByteParser.Error> =
-            Parser.Machine.build { builder in
-                let byte = Parser.Machine.leaf(ByteParser(), in: &builder)
+        let machine: Machine.Parser.Parser<Input, Int, ByteParser.Error> =
+            Machine.Parser.build { builder in
+                let byte = Machine.Parser.leaf(ByteParser(), in: &builder)
                 return byte.map({ Int($0) * 2 }, in: &builder)
             }
 
@@ -54,11 +56,11 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
 
     @Test
     func `sequence - two sequential bytes`() throws {
-        let machine: Parser.Machine.Parser<Input, (UInt8, UInt8), ByteParser.Error> =
-            Parser.Machine.build { builder in
-                let first = Parser.Machine.leaf(ByteParser(), in: &builder)
-                let second = Parser.Machine.leaf(ByteParser(), in: &builder)
-                return Parser.Machine.sequence(first, second, combine: { ($0, $1) }, in: &builder)
+        let machine: Machine.Parser.Parser<Input, (UInt8, UInt8), ByteParser.Error> =
+            Machine.Parser.build { builder in
+                let first = Machine.Parser.leaf(ByteParser(), in: &builder)
+                let second = Machine.Parser.leaf(ByteParser(), in: &builder)
+                return Machine.Parser.sequence(first, second, combine: { ($0, $1) }, in: &builder)
             }
 
         var input1 = makeInput([1, 2, 3])
@@ -76,13 +78,13 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
 
     @Test
     func `oneOf - first match`() throws {
-        let machine: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
-            Parser.Machine.build { builder in
-                let a = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let machine: Machine.Parser.Parser<Input, UInt8, MatchByte.Error> =
+            Machine.Parser.build { builder in
+                let a = Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
                     .map({ $0 }, in: &builder)
-                let b = Parser.Machine.leaf(MatchByte(expected: 66), in: &builder)
+                let b = Machine.Parser.leaf(MatchByte(expected: 66), in: &builder)
                     .map({ $0 }, in: &builder)
-                return Parser.Machine.oneOf([a, b], in: &builder)
+                return Machine.Parser.oneOf([a, b], in: &builder)
             }
 
         var input = makeInput([65, 99])
@@ -94,13 +96,13 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
 
     @Test
     func `oneOf - second match`() throws {
-        let machine: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
-            Parser.Machine.build { builder in
-                let a = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let machine: Machine.Parser.Parser<Input, UInt8, MatchByte.Error> =
+            Machine.Parser.build { builder in
+                let a = Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
                     .map({ $0 }, in: &builder)
-                let b = Parser.Machine.leaf(MatchByte(expected: 66), in: &builder)
+                let b = Machine.Parser.leaf(MatchByte(expected: 66), in: &builder)
                     .map({ $0 }, in: &builder)
-                return Parser.Machine.oneOf([a, b], in: &builder)
+                return Machine.Parser.oneOf([a, b], in: &builder)
             }
 
         var input = makeInput([66, 99])
@@ -112,13 +114,13 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
 
     @Test
     func `oneOf - all fail`() {
-        let machine: Parser.Machine.Parser<Input, UInt8, MatchByte.Error> =
-            Parser.Machine.build { builder in
-                let a = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let machine: Machine.Parser.Parser<Input, UInt8, MatchByte.Error> =
+            Machine.Parser.build { builder in
+                let a = Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
                     .map({ $0 }, in: &builder)
-                let b = Parser.Machine.leaf(MatchByte(expected: 66), in: &builder)
+                let b = Machine.Parser.leaf(MatchByte(expected: 66), in: &builder)
                     .map({ $0 }, in: &builder)
-                return Parser.Machine.oneOf([a, b], in: &builder)
+                return Machine.Parser.oneOf([a, b], in: &builder)
             }
 
         var input = makeInput([99])
@@ -129,11 +131,11 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
 
     @Test
     func `many - zero matches`() throws {
-        let machine: Parser.Machine.Parser<Input, [UInt8], MatchByte.Error> =
-            Parser.Machine.build { builder in
-                let byte = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let machine: Machine.Parser.Parser<Input, [UInt8], MatchByte.Error> =
+            Machine.Parser.build { builder in
+                let byte = Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
                     .map({ $0 }, in: &builder)
-                return Parser.Machine.many(byte, in: &builder)
+                return Machine.Parser.many(byte, in: &builder)
             }
 
         var input = makeInput([66, 67])
@@ -145,11 +147,11 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
 
     @Test
     func `many - multiple matches`() throws {
-        let machine: Parser.Machine.Parser<Input, [UInt8], MatchByte.Error> =
-            Parser.Machine.build { builder in
-                let byte = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let machine: Machine.Parser.Parser<Input, [UInt8], MatchByte.Error> =
+            Machine.Parser.build { builder in
+                let byte = Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
                     .map({ $0 }, in: &builder)
-                return Parser.Machine.many(byte, in: &builder)
+                return Machine.Parser.many(byte, in: &builder)
             }
 
         var input = makeInput([65, 65, 65, 66])
@@ -161,11 +163,11 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
 
     @Test
     func `optional - present`() throws {
-        let machine: Parser.Machine.Parser<Input, UInt8?, MatchByte.Error> =
-            Parser.Machine.build { builder in
-                let byte = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let machine: Machine.Parser.Parser<Input, UInt8?, MatchByte.Error> =
+            Machine.Parser.build { builder in
+                let byte = Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
                     .map({ $0 }, in: &builder)
-                return Parser.Machine.optional(byte, in: &builder)
+                return Machine.Parser.optional(byte, in: &builder)
             }
 
         var input = makeInput([65, 66])
@@ -177,11 +179,11 @@ extension ParserMachineEquivalenceTests.DirectEqualsCompiled {
 
     @Test
     func `optional - absent restores input`() throws {
-        let machine: Parser.Machine.Parser<Input, UInt8?, MatchByte.Error> =
-            Parser.Machine.build { builder in
-                let byte = Parser.Machine.leaf(MatchByte(expected: 65), in: &builder)
+        let machine: Machine.Parser.Parser<Input, UInt8?, MatchByte.Error> =
+            Machine.Parser.build { builder in
+                let byte = Machine.Parser.leaf(MatchByte(expected: 65), in: &builder)
                     .map({ $0 }, in: &builder)
-                return Parser.Machine.optional(byte, in: &builder)
+                return Machine.Parser.optional(byte, in: &builder)
             }
 
         var input = makeInput([66, 67])
@@ -249,7 +251,7 @@ extension ParserMachineEquivalenceTests.`Stack Safety` {
 extension ParserMachineEquivalenceTests.Caching {
     @Test
     func `compiled parses same program twice with identical results`() throws {
-        let compiled = Parser.Machine.Compiled(source: ByteParser(), witness: .leaf)
+        let compiled = Machine.Parser.Compiled(source: ByteParser(), witness: .leaf)
 
         var input1 = makeInput([42])
         let result1 = try compiled.parse(&input1)
@@ -262,7 +264,7 @@ extension ParserMachineEquivalenceTests.Caching {
 
     @Test
     func `prepared from compiled yields same result`() throws {
-        let compiled = Parser.Machine.Compiled(source: ByteParser(), witness: .leaf)
+        let compiled = Machine.Parser.Compiled(source: ByteParser(), witness: .leaf)
         let prepared = compiled.prepared()
 
         var input1 = makeInput([99])
@@ -283,7 +285,7 @@ extension OpenParen {
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: "(") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
     }
 }
 
@@ -295,7 +297,7 @@ extension CloseParen {
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: ")") else { throw .expected }
 
-        _ = try? input.advance()
+        input = input[input.index(after: input.startIndex)..<input.endIndex]
     }
 }
 
@@ -306,34 +308,34 @@ private enum ParenError: Swift.Error, Sendable {
 
 private func balancedParenParser(
     maxDepth: Int
-) -> Parser.Machine.Parser<Input, Int, ParenError> {
-    Parser.Machine.recursive(maxDepth: maxDepth) { builder, selfRef in
-        let empty = Parser.Machine.pure(0, in: &builder)
-        let open = Parser.Machine.leaf(
+) -> Machine.Parser.Parser<Input, Int, ParenError> {
+    Machine.Parser.recursive(maxDepth: maxDepth) { builder, selfRef in
+        let empty = Machine.Parser.pure(0, in: &builder)
+        let open = Machine.Parser.leaf(
             OpenParen(),
             mapError: { _ in ParenError.openParen },
             in: &builder
         )
-        let close = Parser.Machine.leaf(
+        let close = Machine.Parser.leaf(
             CloseParen(),
             mapError: { _ in ParenError.closeParen },
             in: &builder
         )
         let inner = selfRef.expression(in: &builder)
 
-        let recursive = Parser.Machine.sequence(
+        let recursive = Machine.Parser.sequence(
             open,
             inner,
             combine: { (_: Void, depth: Int) in depth },
             in: &builder
         )
-        let withClose = Parser.Machine.sequence(
+        let withClose = Machine.Parser.sequence(
             recursive,
             close,
             combine: { (depth: Int, _: Void) in depth + 1 },
             in: &builder
         )
 
-        return Parser.Machine.oneOf([withClose, empty], in: &builder)
+        return Machine.Parser.oneOf([withClose, empty], in: &builder)
     }
 }

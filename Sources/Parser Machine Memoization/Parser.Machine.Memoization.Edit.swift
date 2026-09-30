@@ -1,4 +1,5 @@
-extension Parser.Machine.Memoization {
+public import Machine
+extension Machine.Parser.Memoization {
 
     public struct Edit<Checkpoint: Comparable> {
 
@@ -17,9 +18,9 @@ extension Parser.Machine.Memoization {
     }
 }
 
-extension Parser.Machine.Memoization.Edit: Sendable where Checkpoint: Sendable {}
+extension Machine.Parser.Memoization.Edit: Sendable where Checkpoint: Sendable {}
 
-extension Parser.Machine.Memoization.Edit where Checkpoint: Numeric {
+extension Machine.Parser.Memoization.Edit where Checkpoint: Numeric {
 
     @inlinable
     public static func insert(at position: Checkpoint, length: Checkpoint) -> Self {
@@ -27,7 +28,7 @@ extension Parser.Machine.Memoization.Edit where Checkpoint: Numeric {
     }
 }
 
-extension Parser.Machine.Memoization.Edit {
+extension Machine.Parser.Memoization.Edit {
 
     @inlinable
     public static func delete(from start: Checkpoint, to end: Checkpoint) -> Self {

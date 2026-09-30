@@ -46,6 +46,11 @@ let package = Package(
         ),
     ],
     dependencies: [
+        .package(url: "https://github.com/swift-atoms/swift-ordinal.git", branch: "main"),
+        .package(url: "https://github.com/swift-atoms/swift-index.git", branch: "main"),
+        .package(url: "https://github.com/swift-atoms/swift-span.git", branch: "main", traits: ["Iterator"]),
+        .package(url: "https://github.com/swift-atoms/swift-ratio.git", branch: "main", traits: ["Bit", "Ordinal", "Difference"]),
+        .package(url: "https://github.com/swift-molecules/swift-graph.git", branch: "main"),
         .package(
             url: "https://github.com/swift-atoms/swift-parser.git",
             branch: "main", traits: ["CollectionLeaves", "Collection", "Either"]),
@@ -91,6 +96,7 @@ let package = Package(
         .target(
             name: "Parser Machine Runtime",
             dependencies: [
+                .product(name: "Graph", package: "swift-graph"),
                 "Parser Machine Program",
                 .product(name: "Parser", package: "swift-parser"),
                 .product(name: "Tagged", package: "swift-tagged"),
@@ -180,6 +186,11 @@ let package = Package(
         .testTarget(
             name: "Parser Machine Compile Tests",
             dependencies: [
+                .product(name: "Ordinal", package: "swift-ordinal"),
+                .product(name: "Index", package: "swift-index"),
+                .product(name: "Checkpoint", package: "swift-checkpoint"),
+                .product(name: "Iterator", package: "swift-iterator"),
+                .product(name: "Cursor", package: "swift-cursor"),
                 "Parser Machine Compile",
                 "Parser Machine Combinator",
                 .product(
@@ -194,6 +205,11 @@ let package = Package(
         .testTarget(
             name: "Parser Machine Combinator Tests",
             dependencies: [
+                .product(name: "Ordinal", package: "swift-ordinal"),
+                .product(name: "Index", package: "swift-index"),
+                .product(name: "Checkpoint", package: "swift-checkpoint"),
+                .product(name: "Iterator", package: "swift-iterator"),
+                .product(name: "Cursor", package: "swift-cursor"),
                 "Parser Machine Combinator",
                 "Parser Machine Parse",
                 .product(
@@ -208,6 +224,11 @@ let package = Package(
         .testTarget(
             name: "Parser Machine Parse Tests",
             dependencies: [
+                .product(name: "Ordinal", package: "swift-ordinal"),
+                .product(name: "Index", package: "swift-index"),
+                .product(name: "Checkpoint", package: "swift-checkpoint"),
+                .product(name: "Iterator", package: "swift-iterator"),
+                .product(name: "Cursor", package: "swift-cursor"),
                 "Parser Machine Parse",
                 "Parser Machine Combinator",
 
@@ -224,6 +245,11 @@ let package = Package(
         .testTarget(
             name: "Parser Machine Equivalence Tests",
             dependencies: [
+                .product(name: "Ordinal", package: "swift-ordinal"),
+                .product(name: "Index", package: "swift-index"),
+                .product(name: "Checkpoint", package: "swift-checkpoint"),
+                .product(name: "Iterator", package: "swift-iterator"),
+                .product(name: "Cursor", package: "swift-cursor"),
                 "Parser Machine Compile",
                 "Parser Machine Combinator",
                 .product(

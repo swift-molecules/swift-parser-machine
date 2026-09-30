@@ -4,7 +4,7 @@ public import Iterator
 public import Machine
 import Parser
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public struct Reference<
         Input: Cursor.`Protocol` & ~Copyable,

@@ -5,13 +5,13 @@ public import Machine
 public import Parser_Machine_Program
 import Parser
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public struct Parser<
         Input: Cursor.`Protocol` & ~Copyable,
         Output,
         Failure: Swift.Error
-    >: Parser.Parsing {
+    >: Parser::Parsing {
         package let program: Program<Input, Failure>
 
         package let root: Node<Input, Failure>.ID
@@ -29,7 +29,7 @@ extension Parser.Machine {
         }
 
         public func parse(_ input: inout Input) throws(Failure) -> Output {
-            try Parser::Parser.Machine.run(
+            try Machine::Machine.Parser.run(
                 program: program,
                 root: root,
                 input: &input,

@@ -3,10 +3,10 @@ public import Cursor
 public import Iterator
 public import Machine
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     public struct Compiled<
-        P: Parser.Parsing<P.Input, P.Output, P.Failure> & ~Copyable
+        P: Parser::Parsing<P.Input, P.Output, P.Failure> & ~Copyable
     >: Copyable
     where
         P.Input: Cursor.`Protocol`,
@@ -28,20 +28,20 @@ extension Parser.Machine {
     }
 }
 
-extension Parser.Machine.Compiled where P: ~Copyable {
+extension Machine.Parser.Compiled where P: ~Copyable {
 
     @usableFromInline
     struct Result {
         @usableFromInline
-        let program: Parser.Machine.Program<P.Input, P.Failure>
+        let program: Machine.Parser.Program<P.Input, P.Failure>
 
         @usableFromInline
-        let root: Parser.Machine.Node<P.Input, P.Failure>.ID
+        let root: Machine.Parser.Node<P.Input, P.Failure>.ID
 
         @usableFromInline
         init(
-            program: Parser.Machine.Program<P.Input, P.Failure>,
-            root: Parser.Machine.Node<P.Input, P.Failure>.ID
+            program: Machine.Parser.Program<P.Input, P.Failure>,
+            root: Machine.Parser.Node<P.Input, P.Failure>.ID
         ) {
             self.program = program
             self.root = root
@@ -49,7 +49,7 @@ extension Parser.Machine.Compiled where P: ~Copyable {
     }
 }
 
-extension Parser.Machine.Compiled where P: ~Copyable {
+extension Machine.Parser.Compiled where P: ~Copyable {
 
     @usableFromInline
     final class Cache {
@@ -60,10 +60,10 @@ extension Parser.Machine.Compiled where P: ~Copyable {
         var source: P?
 
         @usableFromInline
-        let witness: Parser.Machine.Compile.Witness<P>
+        let witness: Machine.Parser.Compile.Witness<P>
 
         @usableFromInline
-        init(source: consuming P, witness: Parser.Machine.Compile.Witness<P>) {
+        init(source: consuming P, witness: Machine.Parser.Compile.Witness<P>) {
             self.compiled = nil
             self.source = consume source
             self.witness = witness
@@ -71,19 +71,19 @@ extension Parser.Machine.Compiled where P: ~Copyable {
     }
 }
 
-extension Parser.Machine.Compiled.Cache where P: ~Copyable {
+extension Machine.Parser.Compiled.Cache where P: ~Copyable {
     @usableFromInline
-    func getOrCompile() -> Parser.Machine.Compiled<P>.Result {
+    func getOrCompile() -> Machine.Parser.Compiled<P>.Result {
         if let existing = compiled {
             return existing
         }
         guard let parser = source.take() else {
 
-            fatalError("Parser.Machine.Compiled.Cache: source consumed but result missing")
+            fatalError("Machine.Parser.Compiled.Cache: source consumed but result missing")
         }
-        var builder = Parser.Machine.Builder<P.Input, P.Failure>()
+        var builder = Machine.Parser.Builder<P.Input, P.Failure>()
         let expression = witness.compile(parser, into: &builder)
-        let result = Parser.Machine.Compiled<P>.Result(
+        let result = Machine.Parser.Compiled<P>.Result(
             program: builder.build(),
             root: expression.node
         )
@@ -92,7 +92,7 @@ extension Parser.Machine.Compiled.Cache where P: ~Copyable {
     }
 }
 
-extension Parser.Machine.Compiled: Parser.Parsing where P: ~Copyable {
+extension Machine.Parser.Compiled: Parser::Parsing where P: ~Copyable {
 
     public typealias Input = P.Input
 
@@ -102,7 +102,7 @@ extension Parser.Machine.Compiled: Parser.Parsing where P: ~Copyable {
 
     public borrowing func parse(_ input: inout Input) throws(Failure) -> Output {
         let result = cache.getOrCompile()
-        return try Parser.Machine.run(
+        return try Machine.Parser.run(
             program: result.program,
             root: result.root,
             input: &input,

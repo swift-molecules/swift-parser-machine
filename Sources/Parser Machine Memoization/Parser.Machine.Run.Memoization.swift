@@ -1,9 +1,10 @@
+package import Cursor
 package import Machine
 import Parser
 internal import Stack
 import Tagged
 
-extension Parser.Machine {
+extension Machine.Parser {
 
     package static func run<Input, Output, Failure>(
         program: Program<Input, Failure>,
@@ -18,12 +19,12 @@ extension Parser.Machine {
         Input.Checkpoint: Hashable,
         Failure: Swift.Error
     {
-        typealias Value = Parser::Parser.Machine.Value
-        typealias Frame = Parser::Parser.Machine.Frame<Input, Failure>
-        typealias Node = Parser::Parser.Machine.Node<Input, Failure>
-        typealias Recovery = Parser::Parser.Machine.Failure.Recovery
-        typealias MemoKey = Parser::Parser.Machine.Memoization.Key<Input.Checkpoint>
-        typealias MemoEntry = Parser::Parser.Machine.Memoization.Entry<Input.Checkpoint>
+        typealias Value = Machine::Machine.Parser.Value
+        typealias Frame = Machine::Machine.Parser.Frame<Input, Failure>
+        typealias Node = Machine::Machine.Parser.Node<Input, Failure>
+        typealias Recovery = Machine::Machine.Parser.Failure.Recovery
+        typealias MemoKey = Machine::Machine.Parser.Memoization.Key<Input.Checkpoint>
+        typealias MemoEntry = Machine::Machine.Parser.Memoization.Entry<Input.Checkpoint>
 
         var current = root
 
@@ -372,7 +373,7 @@ extension Parser.Machine {
 
             case .ref(let target):
                 if let limit = program.maxDepth, depth >= limit {
-                    let error = Parser::Parser.Machine.Runtime.Error.depthExceeded(
+                    let error = Machine::Machine.Parser.Runtime.Error.depthExceeded(
                         limit: limit
                     )
                     switch try handleMemoizedFailure(
