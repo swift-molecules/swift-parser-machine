@@ -168,7 +168,8 @@ let package = Package(
         .testTarget(
             name: "Parser Machine Program Tests",
             dependencies: [
-                "Parser Machine Program"
+                "Parser Machine Program",
+                .product(name: "Collection Parser Test Support", package: "swift-parser"),
             ]
         ),
 
@@ -180,6 +181,7 @@ let package = Package(
                     name: "Tagged Test Support",
                     package: "swift-tagged"
                 ),
+                .product(name: "Collection Parser Test Support", package: "swift-parser"),
             ]
         ),
 
