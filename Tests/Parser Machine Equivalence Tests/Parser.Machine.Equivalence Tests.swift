@@ -277,7 +277,13 @@ extension ParserMachineEquivalenceTests.Caching {
     }
 }
 
-private struct OpenParen: Parsing, Sendable {}
+private struct OpenParen: Parsing, Sendable {
+    var body: Never {
+        borrowing get {
+            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
+        }
+    }
+}
 
 extension OpenParen {
     enum Error: Swift.Error, Sendable { case expected }
@@ -289,7 +295,13 @@ extension OpenParen {
     }
 }
 
-private struct CloseParen: Parsing, Sendable {}
+private struct CloseParen: Parsing, Sendable {
+    var body: Never {
+        borrowing get {
+            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
+        }
+    }
+}
 
 extension CloseParen {
     enum Error: Swift.Error, Sendable { case expected }

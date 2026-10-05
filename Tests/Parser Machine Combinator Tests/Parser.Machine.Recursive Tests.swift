@@ -5,7 +5,13 @@ import Parser_Machine_Parse
 import Parser_Test_Support
 import Testing
 
-private struct OpenParen: Parsing, Sendable {}
+private struct OpenParen: Parsing, Sendable {
+    var body: Never {
+        borrowing get {
+            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
+        }
+    }
+}
 
 extension OpenParen {
     enum Error: Swift.Error, Sendable { case expected }
@@ -17,7 +23,13 @@ extension OpenParen {
     }
 }
 
-private struct CloseParen: Parsing, Sendable {}
+private struct CloseParen: Parsing, Sendable {
+    var body: Never {
+        borrowing get {
+            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
+        }
+    }
+}
 
 extension CloseParen {
     enum Error: Swift.Error, Sendable { case expected }
@@ -77,7 +89,13 @@ private enum XMLContent: Sendable, Equatable {
     case element(XMLElement)
 }
 
-private struct OpenBracket: Parsing, Sendable {}
+private struct OpenBracket: Parsing, Sendable {
+    var body: Never {
+        borrowing get {
+            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
+        }
+    }
+}
 
 extension OpenBracket {
     enum Error: Swift.Error, Sendable { case expected }
@@ -88,7 +106,13 @@ extension OpenBracket {
     }
 }
 
-private struct CloseBracket: Parsing, Sendable {}
+private struct CloseBracket: Parsing, Sendable {
+    var body: Never {
+        borrowing get {
+            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
+        }
+    }
+}
 
 extension CloseBracket {
     enum Error: Swift.Error, Sendable { case expected }
@@ -99,7 +123,13 @@ extension CloseBracket {
     }
 }
 
-private struct SlashClose: Parsing, Sendable {}
+private struct SlashClose: Parsing, Sendable {
+    var body: Never {
+        borrowing get {
+            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
+        }
+    }
+}
 
 extension SlashClose {
     enum Error: Swift.Error, Sendable { case expected }
@@ -117,7 +147,13 @@ private struct StartTagOutput: Sendable {
     var isEmpty: Bool
 }
 
-private struct ParseOpen: Parsing, Sendable {}
+private struct ParseOpen: Parsing, Sendable {
+    var body: Never {
+        borrowing get {
+            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
+        }
+    }
+}
 
 extension ParseOpen {
     enum Error: Swift.Error, Sendable { case expected }
@@ -137,7 +173,13 @@ extension ParseOpen {
     }
 }
 
-private struct ParseClose: Parsing, Sendable {}
+private struct ParseClose: Parsing, Sendable {
+    var body: Never {
+        borrowing get {
+            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
+        }
+    }
+}
 
 extension ParseClose {
     enum Error: Swift.Error, Sendable { case expected }

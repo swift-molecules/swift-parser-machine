@@ -8,7 +8,13 @@ public import Collection_Parser_Test_Support
 
 typealias Input = CollectionParserTest.Input
 
-struct ByteParser: Parsing, Sendable {}
+struct ByteParser: Parsing, Sendable {
+    var body: Never {
+        borrowing get {
+            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
+        }
+    }
+}
 
 extension ByteParser {
     enum Error: Swift.Error, Sendable {
@@ -26,6 +32,12 @@ extension ByteParser {
 }
 
 struct MatchByte: Parsing, Sendable {
+    var body: Never {
+        borrowing get {
+            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
+        }
+    }
+
     let expected: UInt8
 }
 
