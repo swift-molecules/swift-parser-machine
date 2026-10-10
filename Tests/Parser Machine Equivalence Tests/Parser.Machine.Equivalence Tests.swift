@@ -278,11 +278,6 @@ extension ParserMachineEquivalenceTests.Caching {
 }
 
 private struct OpenParen: Parsing, Sendable {
-    var body: Never {
-        borrowing get {
-            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
-        }
-    }
 }
 
 extension OpenParen {
@@ -296,11 +291,6 @@ extension OpenParen {
 }
 
 private struct CloseParen: Parsing, Sendable {
-    var body: Never {
-        borrowing get {
-            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
-        }
-    }
 }
 
 extension CloseParen {

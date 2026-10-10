@@ -12,11 +12,6 @@ extension Machine.Parser {
         Output,
         Failure: Swift.Error
     >: Parser::Parsing {
-        public var body: Never {
-            borrowing get {
-                return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
-            }
-        }
 
         package let program: Program<Input, Failure>
 

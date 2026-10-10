@@ -6,11 +6,6 @@ import Parser_Test_Support
 import Testing
 
 private struct OpenParen: Parsing, Sendable {
-    var body: Never {
-        borrowing get {
-            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
-        }
-    }
 }
 
 extension OpenParen {
@@ -24,11 +19,6 @@ extension OpenParen {
 }
 
 private struct CloseParen: Parsing, Sendable {
-    var body: Never {
-        borrowing get {
-            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
-        }
-    }
 }
 
 extension CloseParen {
@@ -90,11 +80,6 @@ private enum XMLContent: Sendable, Equatable {
 }
 
 private struct OpenBracket: Parsing, Sendable {
-    var body: Never {
-        borrowing get {
-            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
-        }
-    }
 }
 
 extension OpenBracket {
@@ -107,11 +92,6 @@ extension OpenBracket {
 }
 
 private struct CloseBracket: Parsing, Sendable {
-    var body: Never {
-        borrowing get {
-            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
-        }
-    }
 }
 
 extension CloseBracket {
@@ -124,11 +104,6 @@ extension CloseBracket {
 }
 
 private struct SlashClose: Parsing, Sendable {
-    var body: Never {
-        borrowing get {
-            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
-        }
-    }
 }
 
 extension SlashClose {
@@ -148,11 +123,6 @@ private struct StartTagOutput: Sendable {
 }
 
 private struct ParseOpen: Parsing, Sendable {
-    var body: Never {
-        borrowing get {
-            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
-        }
-    }
 }
 
 extension ParseOpen {
@@ -174,11 +144,6 @@ extension ParseOpen {
 }
 
 private struct ParseClose: Parsing, Sendable {
-    var body: Never {
-        borrowing get {
-            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
-        }
-    }
 }
 
 extension ParseClose {

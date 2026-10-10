@@ -12,11 +12,6 @@ extension Machine.Parser {
         P.Input: Cursor.`Protocol`,
         P.Failure: Swift.Error
     {
-        public var body: Never {
-            borrowing get {
-                return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
-            }
-        }
 
         @usableFromInline
         let cache: Cache
