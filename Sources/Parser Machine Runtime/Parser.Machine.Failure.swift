@@ -16,7 +16,5 @@ extension Machine.Parser.Failure {
 }
 
 extension Machine.Parser.Failure.Recovery {
-    package enum Tag {}
-
-    package typealias ID = Tagged<Tag, Ordinal>
+    package typealias ID = Tagged<Machine.Parser.Failure.Recovery, Ordinal>
 }

@@ -73,7 +73,7 @@ extension Machine.Parser {
                                 savedCheckpoint: savedCheckpoint
                             )
                         )
-                        return .continueWith(alternatives[index].retag(Recovery.Tag.self))
+                        return .continueWith(alternatives[index].retag(Recovery.self))
                     }
 
                 case .many(_, let savedCheckpoint, let resultHandles, let finalize):
