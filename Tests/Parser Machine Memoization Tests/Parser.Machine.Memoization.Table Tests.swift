@@ -4,7 +4,7 @@ import Parser_Machine_Memoization
 import Tagged_Test_Support
 import Testing
 
-private enum TestFailure: Swift.Error, Sendable {
+private enum TestFailure: Swift::Error, Sendable {
     case sample
 }
 

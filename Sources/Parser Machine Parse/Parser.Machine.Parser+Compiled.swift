@@ -1,7 +1,7 @@
 public import Machine
-public import Checkpoint
+import Checkpoint
 public import Cursor
-public import Iterator
+import Iterator
 public import Parser
 
 extension Parser::Parsing

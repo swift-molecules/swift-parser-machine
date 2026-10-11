@@ -1,4 +1,4 @@
-package import Machine
+import Machine
 extension Machine.Parser.Memoization {
 
     package struct Key<Checkpoint: Hashable>: Hashable {

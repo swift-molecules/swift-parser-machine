@@ -1,5 +1,5 @@
-public import Ordinal
-public import Index
+import Ordinal
+import Index
 public import Iterator
 public import Cursor
 public import Checkpoint
@@ -13,7 +13,7 @@ struct ByteParser: Parsing, Sendable {
 }
 
 extension ByteParser {
-    enum Error: Swift.Error, Sendable {
+    enum Error: Swift::Error, Sendable {
         case endOfInput
     }
 
@@ -33,7 +33,7 @@ struct MatchByte: Parsing, Sendable {
 }
 
 extension MatchByte {
-    enum Error: Swift.Error, Sendable {
+    enum Error: Swift::Error, Sendable {
         case mismatch(expected: UInt8, actual: UInt8?)
     }
 
@@ -54,7 +54,7 @@ func makeInput(_ bytes: [UInt8]) -> Input {
     Input(bytes)
 }
 
-func makeInput(_ string: Swift.String) -> Input {
+func makeInput(_ string: Swift::String) -> Input {
     Input(utf8: string)
 }
 

@@ -1,6 +1,6 @@
-public import Checkpoint
+import Checkpoint
 public import Cursor
-public import Iterator
+import Iterator
 public import Machine
 import Parser
 public import Tagged
@@ -18,7 +18,7 @@ extension Machine.Parser {
         P.Output == Output,
         P.Failure == Failure,
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     {
         let node = Node<Input, Failure>.leaf(
             Leaf { (input: inout Input) throws(Failure) -> Value in
@@ -40,7 +40,7 @@ extension Machine.Parser {
         P.Input == Input,
         P.Output == Output,
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     {
         let node = Node<Input, Failure>.leaf(
             Leaf { (input: inout Input) throws(Failure) -> Value in

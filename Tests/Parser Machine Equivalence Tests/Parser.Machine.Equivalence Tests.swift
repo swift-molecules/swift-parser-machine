@@ -281,7 +281,7 @@ private struct OpenParen: Parsing, Sendable {
 }
 
 extension OpenParen {
-    enum Error: Swift.Error, Sendable { case expected }
+    enum Error: Swift::Error, Sendable { case expected }
 
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: "(") else { throw .expected }
@@ -294,7 +294,7 @@ private struct CloseParen: Parsing, Sendable {
 }
 
 extension CloseParen {
-    enum Error: Swift.Error, Sendable { case expected }
+    enum Error: Swift::Error, Sendable { case expected }
 
     func parse(_ input: inout Input) throws(Error) {
         guard input.first == UInt8(ascii: ")") else { throw .expected }
@@ -303,7 +303,7 @@ extension CloseParen {
     }
 }
 
-private enum ParenError: Swift.Error, Sendable {
+private enum ParenError: Swift::Error, Sendable {
     case openParen
     case closeParen
 }

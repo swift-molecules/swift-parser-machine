@@ -1,7 +1,7 @@
 public import Machine
-public import Checkpoint
+import Checkpoint
 public import Cursor
-public import Iterator
+import Iterator
 
 extension Machine.Parser {
 
@@ -13,7 +13,7 @@ extension Machine.Parser.Compile {
     public struct Witness<P: Parser::Parsing & ~Copyable>
     where
         P.Input: Cursor.`Protocol`,
-        P.Failure: Swift.Error
+        P.Failure: Swift::Error
     {
         @usableFromInline
         let _compile:

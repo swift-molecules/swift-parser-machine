@@ -1,6 +1,6 @@
-public import Checkpoint
+import Checkpoint
 public import Cursor
-public import Iterator
+import Iterator
 public import Machine
 import Parser
 internal import Tagged
@@ -13,7 +13,7 @@ extension Machine.Parser {
     ) -> Expression<Input, Failure, Output>
     where
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     {
         let node = Node<Input, Failure>.pure(Value.make(value))
         let nodeID = builder.allocate(node)
@@ -56,7 +56,7 @@ extension Machine.Parser {
     ) -> Expression<Input, Failure, NewOutput>
     where
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     {
         let captureID = builder.captures.insert(transform)
         let node = Node<Input, Failure>.tryMap(
@@ -98,7 +98,7 @@ extension Machine.Parser {
     ) -> Expression<Input, Failure, C>
     where
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     {
         let captureID = builder.captures.insert(combine)
         let node = Node<Input, Failure>.sequence(
@@ -119,7 +119,7 @@ extension Machine.Parser {
     ) -> Expression<Input, Failure, Output>
     where
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     {
         let nodeIDs = alternatives.map { $0.node }
         let node = Node<Input, Failure>.oneOf(nodeIDs)
@@ -136,7 +136,7 @@ extension Machine.Parser {
     ) -> Expression<Input, Failure, [T]>
     where
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     {
         let node = Node<Input, Failure>.many(
             child: expr.node,
@@ -155,9 +155,9 @@ extension Machine.Parser {
     ) -> Expression<Input, Failure, T?>
     where
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     {
-        let wrapSome: (T) -> T? = { Swift.Optional.some($0) }
+        let wrapSome: (T) -> T? = { Swift::Optional.some($0) }
         let captureID = builder.captures.insert(wrapSome)
         let node = Node<Input, Failure>.optional(
             child: expr.node,

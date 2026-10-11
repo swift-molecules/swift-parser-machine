@@ -1,5 +1,5 @@
-public import Ordinal
-public import Index
+import Ordinal
+import Index
 public import Iterator
 public import Cursor
 public import Checkpoint
@@ -13,7 +13,7 @@ struct ByteParser: Parsing, Sendable {
 }
 
 extension ByteParser {
-    enum Error: Swift.Error, Sendable {
+    enum Error: Swift::Error, Sendable {
         case endOfInput
     }
 

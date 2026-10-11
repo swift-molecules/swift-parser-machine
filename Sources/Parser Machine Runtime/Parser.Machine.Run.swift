@@ -16,7 +16,7 @@ extension Machine.Parser {
     ) throws(Failure) -> Output
     where
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     {
         typealias Value = Machine::Machine.Parser.Value
         typealias Frame = Machine::Machine.Parser.Frame<Input, Failure>
@@ -54,7 +54,7 @@ extension Machine.Parser {
             }
         }
 
-        func handleFailure<E: Swift.Error>(
+        func handleFailure<E: Swift::Error>(
             error: E,
             frames: inout Stack<Frame>,
             arena: inout Value.Arena,

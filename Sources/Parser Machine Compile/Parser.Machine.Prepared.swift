@@ -1,6 +1,6 @@
-public import Checkpoint
+import Checkpoint
 public import Cursor
-public import Iterator
+import Iterator
 public import Machine
 
 extension Machine.Parser {
@@ -8,7 +8,7 @@ extension Machine.Parser {
     public struct Prepared<P: Parser::Parsing & ~Copyable>
     where
         P.Input: Cursor.`Protocol`,
-        P.Failure: Swift.Error
+        P.Failure: Swift::Error
     {
 
         @usableFromInline

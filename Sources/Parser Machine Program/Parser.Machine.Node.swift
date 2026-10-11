@@ -1,6 +1,6 @@
-public import Checkpoint
+import Checkpoint
 public import Cursor
-public import Iterator
+import Iterator
 public import Machine
 import Parser
 internal import Tagged
@@ -9,11 +9,11 @@ extension Machine.Parser {
 
     public typealias Node<
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     > =
         Machine::Machine.Node<Leaf<Input, Failure>, Failure, Mode>
 
-    public struct Leaf<Input: Cursor.`Protocol` & ~Copyable, Failure: Swift.Error> {
+    public struct Leaf<Input: Cursor.`Protocol` & ~Copyable, Failure: Swift::Error> {
         @usableFromInline
         package let run: (inout Input) throws(Failure) -> Value
 

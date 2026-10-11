@@ -1,6 +1,6 @@
-public import Checkpoint
+import Checkpoint
 public import Cursor
-public import Iterator
+import Iterator
 public import Machine
 import Parser
 
@@ -8,7 +8,7 @@ extension Machine.Parser {
 
     public struct Builder<
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     >: ~Copyable {
         package var inner: Machine::Machine.Builder<Leaf<Input, Failure>, Failure, Mode>
 

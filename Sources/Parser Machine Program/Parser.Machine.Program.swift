@@ -1,6 +1,6 @@
-public import Checkpoint
+import Checkpoint
 public import Cursor
-public import Iterator
+import Iterator
 public import Machine
 import Parser
 internal import Tagged
@@ -9,7 +9,7 @@ extension Machine.Parser {
 
     public typealias Program<
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     > =
         Machine::Machine.Program<Leaf<Input, Failure>, Failure, Mode>
 }

@@ -1,6 +1,6 @@
-public import Checkpoint
+import Checkpoint
 public import Cursor
-public import Iterator
+import Iterator
 public import Machine
 import Parser
 internal import Tagged
@@ -17,7 +17,7 @@ extension Machine.Parser {
     ) -> Parser<Input, Output, Failure>
     where
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     {
         var builder = Builder<Input, Failure>(maxDepth: maxDepth)
 
@@ -36,7 +36,7 @@ extension Machine.Parser {
     ) -> Parser<Input, Output, Failure>
     where
         Input: Cursor.`Protocol` & ~Copyable,
-        Failure: Swift.Error
+        Failure: Swift::Error
     {
         var builder = Builder<Input, Failure>()
         let root = build(&builder)

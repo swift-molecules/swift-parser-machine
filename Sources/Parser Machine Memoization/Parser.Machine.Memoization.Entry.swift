@@ -5,7 +5,7 @@ extension Machine.Parser.Memoization {
 
         case success(output: Machine.Parser.Value, end: Checkpoint)
 
-        case failure(any Swift.Error)
+        case failure(any Swift::Error)
     }
 }
 
