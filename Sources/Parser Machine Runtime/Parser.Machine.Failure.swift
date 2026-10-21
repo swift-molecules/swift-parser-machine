@@ -1,6 +1,6 @@
 package import Machine
-package import Parser_Machine_Program
 import Parser
+package import Parser_Machine_Program
 package import Tagged
 
 extension Machine.Parser {

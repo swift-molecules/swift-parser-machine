@@ -1,6 +1,6 @@
 import Machine
-internal import Parser_Machine_Program
 import Parser
+internal import Parser_Machine_Program
 
 extension Machine.Parser {
     package enum Runtime {}

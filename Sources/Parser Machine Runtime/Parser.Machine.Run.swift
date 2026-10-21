@@ -1,8 +1,8 @@
-import Graph
 package import Cursor
+import Graph
 package import Machine
-package import Parser_Machine_Program
 import Parser
+package import Parser_Machine_Program
 internal import Stack
 import Tagged
 

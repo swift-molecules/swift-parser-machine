@@ -1,11 +1,11 @@
-import Ordinal
-import Index
 public import Checkpoint
+public import Collection_Parser_Test_Support
 public import Cursor
+import Index
 public import Iterator
+import Ordinal
 import Parser_Machine_Combinator
 import Parser_Machine_Compile
-public import Collection_Parser_Test_Support
 
 typealias Input = CollectionParserTest.Input
 

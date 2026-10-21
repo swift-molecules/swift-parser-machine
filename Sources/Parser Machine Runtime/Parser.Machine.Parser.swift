@@ -2,8 +2,8 @@ import Checkpoint
 public import Cursor
 import Iterator
 public import Machine
-public import Parser_Machine_Program
 import Parser
+public import Parser_Machine_Program
 
 extension Machine.Parser {
 
