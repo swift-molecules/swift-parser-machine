@@ -155,7 +155,7 @@ extension ParseClose {
     }
 }
 
-extension Machine.Parser.Test {
+extension `Machine.Parser Tests`.Test {
     @Suite struct Recursive {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
@@ -164,7 +164,7 @@ extension Machine.Parser.Test {
     }
 }
 
-extension Machine.Parser.Test.Recursive.Unit {
+extension `Machine.Parser Tests`.Test.Recursive.Unit {
     @Test
     func `balanced parentheses parses three levels`() throws {
         let parser = balancedParenParser(maxDepth: 1000)
@@ -202,7 +202,7 @@ extension Machine.Parser.Test.Recursive.Unit {
     }
 }
 
-extension Machine.Parser.Test.Recursive.Integration {
+extension `Machine.Parser Tests`.Test.Recursive.Integration {
     @Test
     func `deep nesting 2000 levels without stack overflow`() throws {
         let parser = balancedParenParser(maxDepth: 10000)
@@ -390,7 +390,7 @@ private func unrecoverableRecursionParser(
     )
 }
 
-extension Machine.Parser.Test.Recursive.`Edge Case` {
+extension `Machine.Parser Tests`.Test.Recursive.`Edge Case` {
     @Test
     func `exceeding the depth limit with no recovery throws the configured typed failure`() throws {
         let parser = unrecoverableRecursionParser(maxDepth: 4)

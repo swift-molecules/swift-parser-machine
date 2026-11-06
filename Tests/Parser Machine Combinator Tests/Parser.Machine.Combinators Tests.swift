@@ -4,7 +4,9 @@ import Parser_Machine_Combinator
 import Parser_Test_Support
 import Testing
 
-extension Machine.Parser {
+enum `Machine.Parser Tests` {}
+
+extension `Machine.Parser Tests` {
     @Suite struct Test {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
@@ -13,7 +15,7 @@ extension Machine.Parser {
     }
 }
 
-extension Machine.Parser.Test.Unit {
+extension `Machine.Parser Tests`.Test.Unit {
     @Test
     func `pure always succeeds with given value`() throws {
         let parser: Machine.Parser.Parser<Input, Int, ByteParser.Error> =
@@ -132,7 +134,7 @@ extension Machine.Parser.Test.Unit {
     }
 }
 
-extension Machine.Parser.Test.`Edge Case` {
+extension `Machine.Parser Tests`.Test.`Edge Case` {
     @Test
     func `many returns empty array when no matches`() throws {
         let parser: Machine.Parser.Parser<Input, [UInt8], MatchByte.Error> =
