@@ -30,46 +30,9 @@ extension Machine.Parser {
 }
 
 extension Machine.Parser.Compiled where P: ~Copyable {
-
-    @usableFromInline
-    struct Result {
-        @usableFromInline
-        let program: Machine.Parser.Program<P.Input, P.Failure>
-
-        @usableFromInline
-        let root: Machine.Parser.Node<P.Input, P.Failure>.ID
-
-        @usableFromInline
-        init(
-            program: Machine.Parser.Program<P.Input, P.Failure>,
-            root: Machine.Parser.Node<P.Input, P.Failure>.ID
-        ) {
-            self.program = program
-            self.root = root
-        }
-    }
 }
 
 extension Machine.Parser.Compiled where P: ~Copyable {
-
-    @usableFromInline
-    final class Cache {
-        @usableFromInline
-        var compiled: Result?
-
-        @usableFromInline
-        var source: P?
-
-        @usableFromInline
-        let witness: Machine.Parser.Compile.Witness<P>
-
-        @usableFromInline
-        init(source: consuming P, witness: Machine.Parser.Compile.Witness<P>) {
-            self.compiled = nil
-            self.source = consume source
-            self.witness = witness
-        }
-    }
 }
 
 extension Machine.Parser.Compiled.Cache where P: ~Copyable {
