@@ -5,9 +5,9 @@ import Parser_Machine_Compile
 import Parser_Test_Support
 import Testing
 
-@Suite("Machine.Parser.Equivalence")
+@Suite
 struct ParserMachineEquivalenceTests {
-    @Suite("Direct ≡ Compiled") struct DirectEqualsCompiled {}
+    @Suite struct DirectEqualsCompiled {}
     @Suite struct `Stack Safety` {}
     @Suite struct Caching {}
 }
