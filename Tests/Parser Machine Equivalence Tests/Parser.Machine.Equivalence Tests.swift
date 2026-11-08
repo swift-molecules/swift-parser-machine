@@ -7,8 +7,13 @@ import Testing
 
 @Suite
 struct ParserMachineEquivalenceTests {
+}
+
+extension ParserMachineEquivalenceTests {
     @Suite struct DirectEqualsCompiled {}
+
     @Suite struct `Stack Safety` {}
+
     @Suite struct Caching {}
 }
 
