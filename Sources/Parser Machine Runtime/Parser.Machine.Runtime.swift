@@ -7,4 +7,10 @@ extension Machine.Parser {
 }
 
 extension Machine.Parser.Runtime {
+    package enum Error: Swift::Error, Sendable {
+        case depthExceeded(limit: Int)
+        case typeMismatch
+        case internalError(String)
+        case cachedFailure
+    }
 }
