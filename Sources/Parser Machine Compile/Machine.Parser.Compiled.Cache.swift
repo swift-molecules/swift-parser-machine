@@ -1,5 +1,5 @@
 import Checkpoint
-public import Cursor
+import Cursor
 import Iterator
 public import Machine
 
