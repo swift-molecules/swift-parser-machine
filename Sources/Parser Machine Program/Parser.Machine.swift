@@ -1,5 +1,5 @@
 public import Machine
-@_exported import Parser
+public import Parser
 
 extension Machine::Machine {
 
