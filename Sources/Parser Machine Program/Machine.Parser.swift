@@ -55,3 +55,12 @@ extension Machine.Parser {
         return Expression(node: nodeID)
     }
 }
+
+extension Machine.Parser {
+
+    public typealias Program<
+        Input: Cursor.`Protocol` & ~Copyable,
+        Failure: Swift::Error
+    > =
+        Machine::Machine.Program<Leaf<Input, Failure>, Failure, Mode>
+}
