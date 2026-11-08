@@ -8,11 +8,6 @@ extension Machine.Parser {
 }
 
 extension Machine.Parser.Failure {
-    package enum Recovery {
-        case continueWith(ID)
-        case handleReady(Machine.Parser.Value.Handle)
-        case propagate
-    }
 }
 
 extension Machine.Parser.Failure.Recovery {
