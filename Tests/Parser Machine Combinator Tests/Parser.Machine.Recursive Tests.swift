@@ -34,12 +34,16 @@ extension CloseParen {
 private enum ParenError: Swift::Error, Sendable {
     case openParen
     case closeParen
+    case depthExceeded(limit: Int)
 }
 
 private func balancedParenParser(
     maxDepth: Int
 ) -> Machine.Parser.Parser<Input, Int, ParenError> {
-    Machine.Parser.recursive(maxDepth: maxDepth) { builder, selfRef in
+    Machine.Parser.recursive(
+        maxDepth: maxDepth,
+        onDepthExceeded: { ParenError.depthExceeded(limit: $0) }
+    ) { builder, selfRef in
         let empty = Machine.Parser.pure(0, in: &builder)
         let open = Machine.Parser.leaf(
             OpenParen(),
@@ -234,7 +238,10 @@ extension `Machine.Parser Tests`.Test.Recursive.Integration {
     @Test
     func `deep nesting with complex types 1000 levels`() throws {
         let parser: Machine.Parser.Parser<Input, XMLElement, ParenError> =
-            Machine.Parser.recursive(maxDepth: 2000) { builder, selfRef in
+            Machine.Parser.recursive(
+        maxDepth: 2000,
+        onDepthExceeded: { ParenError.depthExceeded(limit: $0) }
+    ) { builder, selfRef in
                 let open = Machine.Parser.leaf(
                     OpenBracket(),
                     mapError: { _ in ParenError.openParen },
@@ -298,7 +305,10 @@ extension `Machine.Parser Tests`.Test.Recursive.Integration {
     @Test
     func `deep nesting with tryMap disambiguation 50 levels`() throws {
         let parser: Machine.Parser.Parser<Input, XMLElement, ParenError> =
-            Machine.Parser.recursive(maxDepth: 100) { builder, selfRef in
+            Machine.Parser.recursive(
+        maxDepth: 100,
+        onDepthExceeded: { ParenError.depthExceeded(limit: $0) }
+    ) { builder, selfRef in
                 let startTag = Machine.Parser.leaf(
                     ParseOpen(),
                     mapError: { _ in ParenError.openParen },

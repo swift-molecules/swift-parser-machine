@@ -311,12 +311,16 @@ extension CloseParen {
 private enum ParenError: Swift::Error, Sendable {
     case openParen
     case closeParen
+    case depthExceeded(limit: Int)
 }
 
 private func balancedParenParser(
     maxDepth: Int
 ) -> Machine.Parser.Parser<Input, Int, ParenError> {
-    Machine.Parser.recursive(maxDepth: maxDepth) { builder, selfRef in
+    Machine.Parser.recursive(
+        maxDepth: maxDepth,
+        onDepthExceeded: { ParenError.depthExceeded(limit: $0) }
+    ) { builder, selfRef in
         let empty = Machine.Parser.pure(0, in: &builder)
         let open = Machine.Parser.leaf(
             OpenParen(),

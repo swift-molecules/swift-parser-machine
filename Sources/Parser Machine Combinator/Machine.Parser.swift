@@ -8,8 +8,6 @@ internal import Tagged
 extension Machine.Parser {
 
     public static func recursive<Input, Output, Failure>(
-        maxDepth: Int? = nil,
-        onDepthExceeded: ((Int) -> Failure)? = nil,
         _ build: (
             inout Builder<Input, Failure>,
             Reference<Input, Failure, Output>
@@ -19,7 +17,37 @@ extension Machine.Parser {
         Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift::Error
     {
-        var builder = Builder<Input, Failure>(maxDepth: maxDepth)
+        recursive(limit: nil, depthFailure: nil, build)
+    }
+
+    public static func recursive<Input, Output, Failure>(
+        maxDepth: Int,
+        onDepthExceeded: @escaping (Int) -> Failure,
+        _ build: (
+            inout Builder<Input, Failure>,
+            Reference<Input, Failure, Output>
+        ) -> Expression<Input, Failure, Output>
+    ) -> Parser<Input, Output, Failure>
+    where
+        Input: Cursor.`Protocol` & ~Copyable,
+        Failure: Swift::Error
+    {
+        recursive(limit: maxDepth, depthFailure: onDepthExceeded, build)
+    }
+
+    private static func recursive<Input, Output, Failure>(
+        limit: Int?,
+        depthFailure: ((Int) -> Failure)?,
+        _ build: (
+            inout Builder<Input, Failure>,
+            Reference<Input, Failure, Output>
+        ) -> Expression<Input, Failure, Output>
+    ) -> Parser<Input, Output, Failure>
+    where
+        Input: Cursor.`Protocol` & ~Copyable,
+        Failure: Swift::Error
+    {
+        var builder = Builder<Input, Failure>(maxDepth: limit)
 
         let holeID = builder.allocate(.hole)
         let ref = Reference<Input, Failure, Output>(node: holeID)
@@ -28,7 +56,7 @@ extension Machine.Parser {
 
         builder.inner[holeID] = .ref(root.node)
 
-        return Parser(program: builder.build(), root: root.node, depthFailure: onDepthExceeded)
+        return Parser(program: builder.build(), root: root.node, depthFailure: depthFailure)
     }
 
     public static func build<Input, Output, Failure>(

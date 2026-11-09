@@ -47,6 +47,7 @@ extension Keyword {
 private enum TestError: Swift::Error, Sendable {
     case openParen
     case closeParen
+    case depthExceeded(limit: Int)
 }
 
 @Suite
@@ -308,7 +309,10 @@ extension `Machine.Parser.Parser.Parse.Incremental Tests`.Integration {
     @Test
     func `recursive grammar with memoization`() throws {
         let parser: Machine.Parser.Parser<Input, Int, TestError> =
-            Machine.Parser.recursive(maxDepth: 100) { builder, selfRef in
+            Machine.Parser.recursive(
+        maxDepth: 100,
+        onDepthExceeded: { TestError.depthExceeded(limit: $0) }
+    ) { builder, selfRef in
                 let empty = Machine.Parser.pure(0, in: &builder)
                 let open = Machine.Parser.leaf(
                     OpenParen(),
@@ -429,7 +433,10 @@ extension `Machine.Parser.Parser.Parse.Incremental Tests`.Integration {
 
         var refNodeID: Machine.Parser.Node<Input, TestError>.ID!
         let parser: Machine.Parser.Parser<Input, Int, TestError> =
-            Machine.Parser.recursive(maxDepth: 1) { builder, selfRef in
+            Machine.Parser.recursive(
+        maxDepth: 1,
+        onDepthExceeded: { TestError.depthExceeded(limit: $0) }
+    ) { builder, selfRef in
                 let empty = Machine.Parser.pure(0, in: &builder)
                 let open = Machine.Parser.leaf(
                     OpenParen(),
