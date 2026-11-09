@@ -47,26 +47,12 @@ extension Machine.Parser.Memoization.Table {
 extension Machine.Parser.Memoization.Table where Checkpoint: Comparable {
 
     package mutating func invalidate(_ edit: Machine.Parser.Memoization.Edit<Checkpoint>) {
-        storage = storage.filter { key, entry in
-            switch entry {
-            case .success(_, let endPosition):
-                return endPosition <= edit.start
-
-            case .failure:
-                return key.position < edit.start
-            }
-        }
+        invalidate(from: edit.start)
     }
 
     package mutating func invalidate(from position: Checkpoint) {
-        storage = storage.filter { key, entry in
-            switch entry {
-            case .success(_, let endPosition):
-                return endPosition <= position
-
-            case .failure:
-                return key.position < position
-            }
+        storage = storage.filter { _, entry in
+            entry.reach < position
         }
     }
 }

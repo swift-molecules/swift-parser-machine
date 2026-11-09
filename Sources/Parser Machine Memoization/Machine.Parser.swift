@@ -16,7 +16,7 @@ extension Machine.Parser {
     ) throws(Failure) -> Output
     where
         Input: Cursor.`Protocol` & ~Copyable,
-        Input.Checkpoint: Hashable,
+        Input.Checkpoint: Hashable & Comparable,
         Failure: Swift::Error
     {
         typealias Value = Machine::Machine.Parser.Value
@@ -41,6 +41,18 @@ extension Machine.Parser {
 
         var depth = 0
         var pendingHandle: Value.Handle? = nil
+        var reach = input.checkpoint
+        var enclosingReaches: [Input.Checkpoint] = []
+
+        func observe(_ position: Input.Checkpoint) {
+            reach = max(reach, position)
+        }
+
+        func closeMemoizationScope() -> Input.Checkpoint {
+            let scopeReach = reach
+            reach = max(enclosingReaches.removeLast(), scopeReach)
+            return scopeReach
+        }
 
         func handleMemoizedFailure<E: Swift::Error>(
             error: E,
@@ -89,9 +101,10 @@ extension Machine.Parser {
 
                 case .extra(.memoization(let node, let startPosition)):
 
+                    let scopeReach = closeMemoizationScope()
                     if let failure = error as? Failure {
                         let key = MemoKey(position: startPosition, node: node)
-                        memoization.store(.failure(failure), for: key)
+                        memoization.store(.failure(failure, reach: scopeReach), for: key)
                     }
 
                 case .map, .tryMap, .flatMap, .sequence:
@@ -217,8 +230,13 @@ extension Machine.Parser {
 
                 case .extra(.memoization(let node, let startPosition)):
 
+                    observe(input.checkpoint)
                     let key = MemoKey(position: startPosition, node: node)
-                    let entry = MemoEntry.success(output: value, end: input.checkpoint)
+                    let entry = MemoEntry.success(
+                        output: value,
+                        end: input.checkpoint,
+                        reach: closeMemoizationScope()
+                    )
                     memoization.store(entry, for: key)
                     pendingHandle = arena.allocate(value)
                 }
@@ -228,14 +246,15 @@ extension Machine.Parser {
 
             let memoKey = MemoKey(position: input.checkpoint, node: current.underlying)
             if let cached = memoization.lookup(memoKey) {
+                observe(cached.reach)
                 switch cached {
-                case .success(let output, let endPosition):
+                case .success(let output, let endPosition, _):
 
                     input.seek(to: endPosition)
                     pendingHandle = arena.allocate(output)
                     continue
 
-                case .failure(let storedError):
+                case .failure(let storedError, _):
 
                     switch try handleMemoizedFailure(
                         error: storedError,
@@ -272,6 +291,8 @@ extension Machine.Parser {
             frames.push(
                 .extra(.memoization(node: current.underlying, startPosition: input.checkpoint))
             )
+            enclosingReaches.append(reach)
+            reach = input.checkpoint
 
             let node = program[current]
 
@@ -279,8 +300,10 @@ extension Machine.Parser {
             case .leaf(let leaf):
                 do throws(Failure) {
                     let value = try leaf.run(&input)
+                    observe(input.checkpoint)
                     pendingHandle = arena.allocate(value)
                 } catch {
+                    observe(input.checkpoint)
                     switch try handleMemoizedFailure(
                         error: error,
                         frames: &frames,

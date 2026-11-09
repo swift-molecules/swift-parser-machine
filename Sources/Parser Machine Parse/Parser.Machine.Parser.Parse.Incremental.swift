@@ -1,6 +1,6 @@
 public import Machine
 
-extension Machine.Parser.Parser.Parse where Input.Checkpoint: Hashable {
+extension Machine.Parser.Parser.Parse where Input.Checkpoint: Hashable & Comparable {
 
     public var incremental: Incremental {
         Incremental(parser: parser)
@@ -9,7 +9,7 @@ extension Machine.Parser.Parser.Parse where Input.Checkpoint: Hashable {
 
 extension Machine.Parser.Parser.Parse {
 
-    public struct Incremental where Input.Checkpoint: Hashable {
+    public struct Incremental where Input.Checkpoint: Hashable & Comparable {
         package let parser: Machine.Parser.Parser<Input, Output, Failure>
 
         package var memoization: Machine.Parser.Memoization.Table<Input.Checkpoint>
@@ -40,7 +40,7 @@ extension Machine.Parser.Parser.Parse.Incremental {
     }
 }
 
-extension Machine.Parser.Parser.Parse.Incremental where Input.Checkpoint: Comparable {
+extension Machine.Parser.Parser.Parse.Incremental {
 
     public mutating func invalidate(_ edit: Machine.Parser.Memoization.Edit<Input.Checkpoint>) {
         memoization.invalidate(edit)

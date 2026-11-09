@@ -35,7 +35,7 @@ extension `Machine.Parser.Memoization.Table Tests`.Unit {
     func `store and lookup returns entry`() {
         var table = Machine.Parser.Memoization.Table<Int>()
         let key = Machine.Parser.Memoization.Key<Int>(position: 0, node: 1)
-        let entry = Machine.Parser.Memoization.Entry<Int>.failure(TestFailure.sample)
+        let entry = Machine.Parser.Memoization.Entry<Int>.failure(TestFailure.sample, reach: 0)
 
         table.store(entry, for: key)
         let result = table.lookup(key)
@@ -48,8 +48,8 @@ extension `Machine.Parser.Memoization.Table Tests`.Unit {
         let key1 = Machine.Parser.Memoization.Key<Int>(position: 0, node: 1)
         let key2 = Machine.Parser.Memoization.Key<Int>(position: 1, node: 1)
 
-        table.store(.failure(TestFailure.sample), for: key1)
-        table.store(.failure(TestFailure.sample), for: key2)
+        table.store(.failure(TestFailure.sample, reach: 0), for: key1)
+        table.store(.failure(TestFailure.sample, reach: 1), for: key2)
         #expect(table.count == 2)
     }
 
@@ -57,7 +57,7 @@ extension `Machine.Parser.Memoization.Table Tests`.Unit {
     func `clear removes all entries`() {
         var table = Machine.Parser.Memoization.Table<Int>()
         let key = Machine.Parser.Memoization.Key<Int>(position: 0, node: 1)
-        table.store(.failure(TestFailure.sample), for: key)
+        table.store(.failure(TestFailure.sample, reach: 0), for: key)
         #expect(!table.isEmpty)
 
         table.clear()
@@ -79,11 +79,11 @@ extension `Machine.Parser.Memoization.Table Tests`.`Edge Case` {
         var table = Machine.Parser.Memoization.Table<Int>()
         let key = Machine.Parser.Memoization.Key<Int>(position: 0, node: 1)
 
-        table.store(.failure(TestFailure.sample), for: key)
+        table.store(.failure(TestFailure.sample, reach: 0), for: key)
         #expect(table.lookup(key)?.isFailure == true)
 
         let value = Machine.Parser.Value.make(42)
-        table.store(.success(output: value, end: 1), for: key)
+        table.store(.success(output: value, end: 1, reach: 1), for: key)
         #expect(table.lookup(key)?.isSuccess == true)
         #expect(table.count == 1)
     }
@@ -95,9 +95,9 @@ extension `Machine.Parser.Memoization.Table Tests`.`Edge Case` {
         let key5 = Machine.Parser.Memoization.Key<Int>(position: 5, node: 1)
         let key10 = Machine.Parser.Memoization.Key<Int>(position: 10, node: 1)
 
-        table.store(.failure(TestFailure.sample), for: key0)
-        table.store(.failure(TestFailure.sample), for: key5)
-        table.store(.failure(TestFailure.sample), for: key10)
+        table.store(.failure(TestFailure.sample, reach: 0), for: key0)
+        table.store(.failure(TestFailure.sample, reach: 5), for: key5)
+        table.store(.failure(TestFailure.sample, reach: 10), for: key10)
         #expect(table.count == 3)
 
         table.invalidate(from: 5)
@@ -114,9 +114,9 @@ extension `Machine.Parser.Memoization.Table Tests`.`Edge Case` {
         let key5 = Machine.Parser.Memoization.Key<Int>(position: 5, node: 1)
         let key15 = Machine.Parser.Memoization.Key<Int>(position: 15, node: 1)
 
-        table.store(.failure(TestFailure.sample), for: key0)
-        table.store(.failure(TestFailure.sample), for: key5)
-        table.store(.failure(TestFailure.sample), for: key15)
+        table.store(.failure(TestFailure.sample, reach: 0), for: key0)
+        table.store(.failure(TestFailure.sample, reach: 5), for: key5)
+        table.store(.failure(TestFailure.sample, reach: 15), for: key15)
         #expect(table.count == 3)
 
         let edit = Machine.Parser.Memoization.Edit<Int>(start: 5, oldEnd: 10, newEnd: 8)
@@ -124,5 +124,15 @@ extension `Machine.Parser.Memoization.Table Tests`.`Edge Case` {
 
         #expect(table.lookup(key0) != nil)
         #expect(table.lookup(key5) == nil)
+    }
+
+    @Test
+    func `invalidate removes a failure that started before the edit but read across it`() {
+        var table = Machine.Parser.Memoization.Table<Int>()
+        let key = Machine.Parser.Memoization.Key<Int>(position: 0, node: 1)
+        table.store(.failure(TestFailure.sample, reach: 7), for: key)
+
+        table.invalidate(.init(start: 5, oldEnd: 6, newEnd: 6))
+        #expect(table.lookup(key) == nil)
     }
 }

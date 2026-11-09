@@ -30,6 +30,20 @@ extension CloseParen {
     }
 }
 
+private struct Keyword: Parsing, Sendable {
+    let bytes: [UInt8]
+}
+
+extension Keyword {
+    enum Error: Swift::Error, Sendable { case mismatch }
+    func parse(_ input: inout Input) throws(Error) -> [UInt8] {
+        for expected in bytes {
+            guard input.next() == expected else { throw .mismatch }
+        }
+        return bytes
+    }
+}
+
 private enum TestError: Swift::Error, Sendable {
     case openParen
     case closeParen
@@ -354,6 +368,63 @@ extension `Machine.Parser.Parser.Parse.Incremental Tests`.Integration {
     }
 
     @Test
+    func `failure that read across an edit is not replayed after invalidate`() throws {
+        let parser: Machine.Parser.Parser<Input, [UInt8], Keyword.Error> =
+            Machine.Parser.build { builder in
+                Machine.Parser.leaf(Keyword(bytes: [65, 66, 67]), in: &builder)
+            }
+
+        var ctx = parser.parse.incremental
+
+        var original = Input([65, 66, 88])
+        #expect(throws: Keyword.Error.self) {
+            _ = try ctx(&original)
+        }
+
+        ctx.invalidate(.init(start: 2, oldEnd: 3, newEnd: 3))
+        var edited = Input([65, 66, 67])
+        let result = try ctx(&edited)
+        #expect(result == [65, 66, 67])
+    }
+
+    @Test
+    func `failed alternative that read across an edit is retried after invalidate`() throws {
+        let parser: Machine.Parser.Parser<Input, [UInt8], Keyword.Error> =
+            Machine.Parser.build { builder in
+                let long = Machine.Parser.leaf(Keyword(bytes: [65, 66, 67]), in: &builder)
+                let short = Machine.Parser.leaf(Keyword(bytes: [65]), in: &builder)
+                return Machine.Parser.oneOf([long, short], in: &builder)
+            }
+
+        var ctx = parser.parse.incremental
+
+        var original = Input([65, 66, 88])
+        #expect(try ctx(&original) == [65])
+
+        ctx.invalidate(.init(start: 2, oldEnd: 3, newEnd: 3))
+        var edited = Input([65, 66, 67])
+        #expect(try ctx(&edited) == [65, 66, 67])
+    }
+
+    @Test
+    func `success that stopped at an edit is not replayed after invalidate`() throws {
+        let parser: Machine.Parser.Parser<Input, [UInt8], ByteParser.Error> =
+            Machine.Parser.build { builder in
+                let byte = Machine.Parser.leaf(ByteParser(), in: &builder)
+                return Machine.Parser.many(byte, in: &builder)
+            }
+
+        var ctx = parser.parse.incremental
+
+        var original = Input([65, 66])
+        #expect(try ctx(&original) == [65, 66])
+
+        ctx.invalidate(.insert(at: 2, length: 1))
+        var edited = Input([65, 66, 67])
+        #expect(try ctx(&edited) == [65, 66, 67])
+    }
+
+    @Test
     func `depth-exceeded ref failure is never cached as a foreign-typed entry`() throws {
 
         var refNodeID: Machine.Parser.Node<Input, TestError>.ID!
@@ -408,7 +479,7 @@ extension `Machine.Parser.Parser.Parse.Incremental Tests`.Integration {
                     "expected no success entry for a depth-exceeding node at \(position)"
                 )
 
-            case .failure(let storedError):
+            case .failure(let storedError, _):
                 #expect(
                     storedError is TestError,
                     "cached failure at position \(position) is not TestError"
