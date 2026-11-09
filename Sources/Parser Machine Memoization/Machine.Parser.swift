@@ -63,7 +63,7 @@ extension Machine.Parser {
             memoization: inout Memoization.Table<Input.Checkpoint>
         ) throws(Failure) -> Recovery {
             while let frame = frames.pop() {
-                switch frame {
+                switch consume frame {
                 case .oneOf(let alternatives, let index, let savedCheckpoint):
                     if index < alternatives.count {
                         input.seek(to: savedCheckpoint)
@@ -127,7 +127,7 @@ extension Machine.Parser {
                     fatalError("Internal error: expected frame on stack")
                 }
 
-                switch frame {
+                switch consume frame {
                 case .map(let transform):
                     let transformed = transform.apply(using: program.captures, value)
                     pendingHandle = arena.allocate(transformed)

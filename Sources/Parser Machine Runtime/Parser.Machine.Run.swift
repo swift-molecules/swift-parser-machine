@@ -39,17 +39,19 @@ extension Machine.Parser {
         var depth = 0
         var pendingHandle: Value.Handle? = nil
 
-        func checkInvariants(_ label: String) {
-            let context = "[\(label)]"
-            precondition(depth >= 0, "\(context) depth went negative: \(depth)")
+        let nodeCount = program.graph.count
+        let depthLimit = program.maxDepth
+
+        func checkInvariants(_ label: StaticString) {
+            precondition(depth >= 0, "[\(label)] depth went negative: \(depth)")
             precondition(
-                current < program.graph.count,
-                "\(context) current node out of bounds: \(current)"
+                current < nodeCount,
+                "[\(label)] current node out of bounds: \(current)"
             )
-            if let limit = program.maxDepth {
+            if let depthLimit {
                 precondition(
-                    depth <= limit + 1,
-                    "\(context) depth exceeded limit: \(depth) > \(limit)"
+                    depth <= depthLimit + 1,
+                    "[\(label)] depth exceeded limit: \(depth) > \(depthLimit)"
                 )
             }
         }
@@ -62,7 +64,7 @@ extension Machine.Parser {
             depth: inout Int
         ) throws(Failure) -> Recovery {
             while let frame = frames.pop() {
-                switch frame {
+                switch consume frame {
                 case .oneOf(let alternatives, let index, let savedCheckpoint):
                     if index < alternatives.count {
                         input.seek(to: savedCheckpoint)
@@ -123,7 +125,7 @@ extension Machine.Parser {
                     fatalError("Internal error: expected frame on stack")
                 }
 
-                switch frame {
+                switch consume frame {
                 case .map(let transform):
                     let transformed = transform.apply(using: program.captures, value)
                     pendingHandle = arena.allocate(transformed)
