@@ -17,7 +17,7 @@ extension Machine.Parser {
         Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift::Error
     {
-        recursive(limit: nil, depthFailure: nil, build)
+        recursive(limit: nil, depthFailure: nil, build: build)
     }
 
     public static func recursive<Input, Output, Failure>(
@@ -32,13 +32,13 @@ extension Machine.Parser {
         Input: Cursor.`Protocol` & ~Copyable,
         Failure: Swift::Error
     {
-        recursive(limit: maxDepth, depthFailure: onDepthExceeded, build)
+        recursive(limit: maxDepth, depthFailure: onDepthExceeded, build: build)
     }
 
     private static func recursive<Input, Output, Failure>(
         limit: Int?,
         depthFailure: ((Int) -> Failure)?,
-        _ build: (
+        build: (
             inout Builder<Input, Failure>,
             Reference<Input, Failure, Output>
         ) -> Expression<Input, Failure, Output>
