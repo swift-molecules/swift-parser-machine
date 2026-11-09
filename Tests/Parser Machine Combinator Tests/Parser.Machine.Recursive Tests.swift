@@ -239,9 +239,9 @@ extension `Machine.Parser Tests`.Test.Recursive.Integration {
     func `deep nesting with complex types 1000 levels`() throws {
         let parser: Machine.Parser.Parser<Input, XMLElement, ParenError> =
             Machine.Parser.recursive(
-        maxDepth: 2000,
-        onDepthExceeded: { ParenError.depthExceeded(limit: $0) }
-    ) { builder, selfRef in
+                maxDepth: 2000,
+                onDepthExceeded: { ParenError.depthExceeded(limit: $0) }
+            ) { builder, selfRef in
                 let open = Machine.Parser.leaf(
                     OpenBracket(),
                     mapError: { _ in ParenError.openParen },
@@ -306,9 +306,9 @@ extension `Machine.Parser Tests`.Test.Recursive.Integration {
     func `deep nesting with tryMap disambiguation 50 levels`() throws {
         let parser: Machine.Parser.Parser<Input, XMLElement, ParenError> =
             Machine.Parser.recursive(
-        maxDepth: 100,
-        onDepthExceeded: { ParenError.depthExceeded(limit: $0) }
-    ) { builder, selfRef in
+                maxDepth: 100,
+                onDepthExceeded: { ParenError.depthExceeded(limit: $0) }
+            ) { builder, selfRef in
                 let startTag = Machine.Parser.leaf(
                     ParseOpen(),
                     mapError: { _ in ParenError.openParen },
